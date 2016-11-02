@@ -10,13 +10,16 @@ int main()
 
 	Fl_Window *win = new Fl_Window(340, 180);
 
-	shop.create_rand_part();
+	//shop.create_rand_part();
 
 	Head *h;
-	Torso *t;
+	Torso *t, *t2;
 	Locomotor *l;
 	Battery *b;
 	Arm *a;
+
+	t = new Torso("Test torso", 123456, 12.5, 12.7, "Testing, testing, 1, 2, 3", 2);
+	shop.add(*t);
 
 	if (shop.get_available_heads().size() != 0)
 	{
@@ -25,8 +28,10 @@ int main()
 	}
 	else if (shop.get_available_torsos().size() != 0)
 	{
-		*t = shop.get_available_torsos()[0];
-		fl_choice(("Random torso created:\n" + t->to_string()).c_str(), "OK");
+		*t2 = shop.get_available_torsos()[0];
+		string cpp_str_out = "Random torso created:\n" + t2->to_string();
+		char* c_str_out = cpp_str_out.c_str();
+		fl_choice(c_str_out, "OK", 0, 0);
 	}
 	else if (shop.get_available_locomotors().size() != 0)
 	{
