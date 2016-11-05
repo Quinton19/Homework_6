@@ -33,8 +33,8 @@ int main()
 	};
 
 	menubar->menu(menuitems);
-
-	window->callback(Create_Robot_PartCB, "replace later");
+	string test = "replace later";
+	window->callback(Create_Robot_PartCB, &test);
 	window->callback(CloseCB, &t);
 	/*
 	shop.create_rand_part();

@@ -17,7 +17,7 @@ Fl_Wizard* wiz;
 
 void back_cb(Fl_Widget*, void*) { wiz->prev(); }
 void next_cb(Fl_Widget*, void*) { wiz->next(); }
-void done_cb(Fl_Widget*, void*) { exit(0); }
+void done_cb(Fl_Widget*, void*) { wiz->hide(); win->hide(); }
 
 void Controller::Robot_Part_Dialog()
 {
@@ -29,17 +29,18 @@ void Controller::Robot_Part_Dialog()
 	win = new Fl_Window(400, 300);
 	wiz = new Fl_Wizard(0, 0, 400, 300);
 
-	
+	/*
 	//Wizard: Page 1
 	{
 		Fl_Group* g = new Fl_Group(X, Y, W, H, "Please select the appropiate robot part type");
+		string test1 = "mewo";
 		Fl_Button* done = new Fl_Button(290, 265, 100, 25, "Done @->");
-		done->callback(done_cb, "meow");
+		done->callback(done_cb, &test1);
 		//try Fl_Menu_Button
 		g->end();
 	}
+	*/
 	
-	/*
 	// Wizard: page 1
 	{
 		Fl_Group *g = new Fl_Group(0, 0, 400, 300);
