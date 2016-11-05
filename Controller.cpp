@@ -1,6 +1,86 @@
 #include "Controller.h"
 #include <iomanip>
 
+#include <FL/Fl_Widget.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Multiline_Input.H>
+#include <FL/Fl_Wizard.H>
+#include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Radio_Button.H>
+
+Fl_Window* win;
+Fl_Wizard* wiz;
+
+void back_cb(Fl_Widget*, void*) { wiz->prev(); }
+void next_cb(Fl_Widget*, void*) { wiz->next(); }
+void done_cb(Fl_Widget*, void*) { exit(0); }
+
+void Controller::Robot_Part_Dialog()
+{
+	const int X = 20;
+	const int Y = 20;
+	const int W = 150;
+	const int H = 50;
+
+	win = new Fl_Window(400, 300);
+	wiz = new Fl_Wizard(0, 0, 400, 300);
+
+	
+	//Wizard: Page 1
+	{
+		Fl_Group* g = new Fl_Group(X, Y, W, H, "Please select the appropiate robot part type");
+		Fl_Button* done = new Fl_Button(290, 265, 100, 25, "Done @->");
+		done->callback(done_cb, "meow");
+		//try Fl_Menu_Button
+		g->end();
+	}
+	
+	/*
+	// Wizard: page 1
+	{
+		Fl_Group *g = new Fl_Group(0, 0, 400, 300);
+		Fl_Button *next = new Fl_Button(290, 265, 100, 25, "Next @->"); next->callback(next_cb);
+		Fl_Multiline_Output *out = new Fl_Multiline_Output(10, 30, 400 - 20, 300 - 80, "Welcome");
+		out->labelsize(20);
+		out->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+		out->value("This is First page");
+		g->end();
+	}
+	// Wizard: page 2
+	{
+		Fl_Group *g = new Fl_Group(0, 0, 400, 300);
+		Fl_Button *next = new Fl_Button(290, 265, 100, 25, "Next @->"); next->callback(next_cb);
+		Fl_Button *back = new Fl_Button(180, 265, 100, 25, "@<- Back"); back->callback(back_cb);
+		Fl_Multiline_Output *out = new Fl_Multiline_Output(10, 30, 400 - 20, 300 - 80, "Terms And Conditions");
+		out->labelsize(20);
+		out->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+		out->value("This is the Second page");
+		g->end();
+	}
+	// Wizard: page 3
+	{
+		Fl_Group *g = new Fl_Group(0, 0, 400, 300);
+		Fl_Button *done = new Fl_Button(290, 265, 100, 25, "Finish"); done->callback(done_cb);
+		Fl_Button *back = new Fl_Button(180, 265, 100, 25, "@<- Back"); back->callback(back_cb);
+		Fl_Multiline_Output *out = new Fl_Multiline_Output(10, 30, 400 - 20, 300 - 80, "Finish");
+		out->labelsize(20);
+		out->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+		out->value("This is the Last page");
+		g->end();
+	}/**/
+
+	wiz->end();
+	win->end();
+	win->show();
+}
+
+
+
+/*
 void Controller::cli()
 {
 	int cmd;
@@ -802,3 +882,4 @@ void Controller::order_robot_models()
 		<< "Total: $" << shop.get_models()[choice - 1].get_price() * quantity << "\n"
 		<< "-------------------------------------------------\n\n";
 }
+*/

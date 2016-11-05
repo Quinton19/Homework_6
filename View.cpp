@@ -81,7 +81,7 @@ void View::help()
 }
 
 void View::display_receipt_header()
-{
+{/*
 	chrono::time_point<chrono::system_clock> now;
 	now = chrono::system_clock::now();
 	time_t time = chrono::system_clock::to_time_t(now);
@@ -89,5 +89,5 @@ void View::display_receipt_header()
 		<< "          Robbie Robot Shop Model Order          \n"
 		<< "-------------------------------------------------\n"
 		<< "Date: " << ctime(&time) << "\n"
-		<< "Order:\n";
+		<< "Order:\n";*/
 }
