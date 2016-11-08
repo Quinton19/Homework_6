@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include <iomanip>
-
+#include <iostream>
+#include <string>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
@@ -10,36 +11,101 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Menu_Button.H>
-
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Menu_Bar.H>
+/*
 Fl_Window* win;
 
-void Controller::Robot_Part_Dialog()
+void head_cb(Fl_Widget* w, void* p)
 {
-	const int X = 100;
-	int Y = 20;
-	const int W = 150;
-	const int H = 50;
+    //string* chosen_option = (string*)p;
+    //chosen_option = new string{"Head"};
+}
+void torso_cb(Fl_Widget* w, void* p)
+{
+    //string* chosen_option = (string*)p;
+    //chosen_option = new string{"Torso"};
+}
+void locomotor_cb(Fl_Widget* w, void* p)
+{
+    //string* chosen_option = (string*)p;
+    //chosen_option = new string{"Locomotor"};
+}
+void battery_cb(Fl_Widget* w, void* p)
+{
+    //string* chosen_option = (string*)p;
+    //chosen_option = new string{"Battery"};
+}
+void arm_cb(Fl_Widget* w, void* p)
+{
+    //string* chosen_option = (string*)p;
+    //chosen_option = new string{"Arm"};
+}
 
-	win = new Fl_Window(500, 600);
+void Create_Robot_PartCB1(Fl_Widget* w, void* p)
+{
+	//controller->Robot_Part_Dialog();
+}
 
-	Fl_Menu_Button* part_choice = new Fl_Menu_Button(20, Y, W, H, "Select the part's type");
-	Y += H + 15;
-	Fl_Input* name_in = new Fl_Input(X, Y, W, H, "Part's Name:\n");
-	Y += H + 15;
-	Fl_Int_Input* part_num_in = new Fl_Int_Input(X, Y, W, H, "Part Number:\n");
-	Y += H + 15;
-	Fl_Float_Input* weight_in = new Fl_Float_Input(X, Y, W, H, "Part's Weight:\n");
-	Y += H + 15;
-	Fl_Float_Input* cost_in = new Fl_Float_Input(X, Y, W, H, "Part's cost:\n");
-	Y += H + 15;
-	Fl_Multiline_Input* description_in = new Fl_Multiline_Input(X, Y, W, W, "Part description:\n");
-	win->resizable(win);
-	win->end();
-	win->show();
+void CloseCB1(Fl_Widget* w, void* p)
+{
+	//win->hide();
 }
 
 
+void Controller::Robot_Part_Dialog()
+{
+	const int X = 20;
+	int Y = 20;
+	const int W = 250;
+	const int H = 35;
+    string* choice;
 
+	win = new Fl_Window(500, 600, "Create a Robot Part");
+
+	
+	Y += H + 425;
+    
+    Fl_Menu_Item menuitems2[] = {
+		{"&Create", 0, 0, 0, FL_SUBMENU },
+			{"&Robot Part", 0, (Fl_Callback*)Create_Robot_PartCB1 },
+			{ 0 },
+		{"&Quit", 0, (Fl_Callback*)CloseCB1 },
+		{ 0 }
+	};
+    //menitems2 = menuitems2;
+    items = menuitems2;
+    part_choice->menu(items);
+    
+    win->callback(head_cb, win);
+    win->callback(torso_cb, win);
+    win->callback(locomotor_cb, choice);
+    win->callback(battery_cb, choice);
+    win->callback(arm_cb, choice);
+    /*
+	Fl_Input* name_in = new Fl_Input(X, Y, W, H, "Part's Name:");
+    name_in->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	Y += H + 25;
+	Fl_Int_Input* part_num_in = new Fl_Int_Input(X, Y, W, H, "Part Number:");
+    part_num_in->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	Y += H + 25;
+	Fl_Float_Input* weight_in = new Fl_Float_Input(X, Y, W, H, "Part's Weight:");
+    weight_in->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	Y += H + 25;
+	Fl_Float_Input* cost_in = new Fl_Float_Input(X, Y, W, H, "Part's cost:");
+    cost_in->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	Y += H + 25;
+	Fl_Multiline_Input* description_in = new Fl_Multiline_Input(X, Y, W + H, W, "Part description:");
+    description_in->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+    *//*
+	win->resizable(win);
+    win->end();
+	win->show();
+    //win->make_current();
+}
+
+
+*/
 /*
 void Controller::cli()
 {
