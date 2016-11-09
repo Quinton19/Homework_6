@@ -23,6 +23,7 @@ void Open_Robot_Part_DialogCB(Fl_Widget* w, void* p);
 void CloseCB(Fl_Widget* w, void* p);
 void Cancel_Robot_PartCB(Fl_Widget* w, void* p);
 void Selected_Part_TypeCB(Fl_Widget* w, void* p);
+void Selected_CompartmentsCB(Fl_Widget* w, void* p);
 class Robot_Part_Dialog;
 
 Fl_Window *window;
@@ -77,6 +78,7 @@ public:
 		batt_compartments_in = new Fl_Choice(x, y, w, h, "Number of Battery Compartments:"); 
 		batt_compartments_in->align(FL_ALIGN_LEFT);
 
+		batt_compartments_in->callback(Selected_CompartmentsCB, NULL);
 		batt_compartments_in->add("1");
 		batt_compartments_in->add("2");
 		batt_compartments_in->add("3");
@@ -107,6 +109,8 @@ public:
 	void show_torso_extras()
 	{
 		hide_extras();
+		if (strcmp(part_num_in->value(), "") == 0)
+			part_num_in->hide();
 		batt_compartments_in->show();
 	}
 	void show_locomotor_extras()
@@ -167,6 +171,22 @@ public:
 	{
 		return description_in->value();
 	}
+	bool has_empty_fields()
+	{
+		bool is_empty = false;
+
+		if (strcmp(name_in->value(), "") == 0)
+			is_empty = true;
+		//else if()
+	}
+	void type_chosen()
+	{
+		chose_type = true;
+	}
+	void compartment_num_chosen()
+	{
+		chose_compartment_num = true;
+	}
 private:
 	Fl_Window *dialog;
 	Fl_Choice *type_in;
@@ -183,6 +203,9 @@ private:
 	Fl_Int_Input *speed_in;
 	Fl_Float_Input *pwr_consumed_in;
 	Fl_Float_Input *energy_in;
+
+	bool chose_type = false;
+	bool chose_compartment_num = false;
 };
 
 int main()
@@ -271,10 +294,16 @@ void Cancel_Robot_PartCB(Fl_Widget* w, void* p)
 
 void Selected_Part_TypeCB(Fl_Widget * w, void * p)
 {
+	robot_part_dlg->type_chosen();
 	if (robot_part_dlg->type().compare("Head") == 0)
 		robot_part_dlg->hide_extras();
 	else if (robot_part_dlg->type().compare("Torso") == 0)
 		robot_part_dlg->show_torso_extras();
 	else
 		robot_part_dlg->hide_extras();
+}
+
+void Selected_CompartmentsCB(Fl_Widget * w, void * p)
+{
+	robot_part_dlg->compartment_num_chosen();
 }
