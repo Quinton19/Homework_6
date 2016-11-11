@@ -90,9 +90,18 @@ void Robot_Model::add_battery(Battery b)
 string Robot_Model::to_string()
 {
 	string result;
+
 	result = "Model name: " + get_name() + "\n"
 		+ "Model Number: " + Str_conversion::to_string(get_model_num()) + "\n"
-		+ "Price: $" + Str_conversion::to_string(get_price()) + "\n";
+		+ "Price: $" + Str_conversion::to_string(get_price()) + "\n"
+		+ "Head: " + get_head().get_name() + " -- #" + Str_conversion::to_string(get_head().get_part_num()) + "\n"
+		+ "Torso: " + get_torso().get_name() + " -- #" + Str_conversion::to_string(get_torso().get_part_num()) + "\n"
+		+ "Locomotor: " + get_locomotor().get_name() + " -- #" + Str_conversion::to_string(get_locomotor().get_part_num()) + "\n";
+	for (int i = 0; i < get_batteries().size(); i++)
+		result += "Battery " + Str_conversion::to_string(i+1) + ": " + get_batteries()[i].get_name() + " -- #" + Str_conversion::to_string(get_batteries()[i].get_part_num()) + "\n";
+	for (int i = 0; i < get_arms().size(); i++)
+		result += "Arm " + Str_conversion::to_string(i + 1) + ": " + get_arms()[i].get_name() + " -- #" + Str_conversion::to_string(get_arms()[i].get_part_num()) + "\n";
+
 	return result;
 }
 

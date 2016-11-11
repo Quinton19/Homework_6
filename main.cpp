@@ -17,7 +17,6 @@
 #include <FL/Fl_Box.H>
 #include <string>
 #include <iostream>
-#include <functional>
 #include "Shop.h"
 using namespace std;
 
@@ -41,6 +40,7 @@ void Yes_Another_ArmCB(Fl_Widget* w, void* p);
 void No_Another_ArmCB(Fl_Widget* w, void* p);
 void Create_Robot_ModelCB(Fl_Widget* w, void* p);
 void Cancel_Robot_ModelCB(Fl_Widget* w, void* p);
+void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 
@@ -50,7 +50,7 @@ Robot_Part_Dialog *robot_part_dlg;
 Robot_Model_Dialog *robot_model_dlg;
 
 
-//-------------------------------------------------------------------------------------------------------------------------------------------
+//============================================================================================================================================
 class Robot_Part_Dialog
 {
 public:
@@ -293,7 +293,7 @@ private:
     bool chose_type = false;
     bool chose_compartment_num = false;
 };
-//-------------------------------------------------------------------------------------------------------------------------------------------
+//==========================================================================================================================================================
 
 class Robot_Model_Dialog
 {
@@ -415,21 +415,21 @@ public:
 		head_choice->clear();
 		for (Head h : shop_heads)
 		{
-			head_choice->add((h.get_name() + " -- #" + Str_conversion::to_string(h.get_part_num())).c_str());
+			head_choice->add((h.get_name() + " -- $" + Str_conversion::to_string(h.get_cost())).c_str());
 		}
 
 		shop_torsos = shop->get_available_torsos();
 		torso_choice->clear();
 		for (Torso t : shop_torsos)
 		{
-			torso_choice->add((t.get_name() + " -- #" + Str_conversion::to_string(t.get_part_num())).c_str());
+			torso_choice->add((t.get_name() + " -- $" + Str_conversion::to_string(t.get_cost())).c_str());
 		}
 
 		shop_locomotors = shop->get_available_locomotors();
 		locomotor_choice->clear();
 		for (Locomotor l : shop_locomotors)
 		{
-			locomotor_choice->add((l.get_name() + " -- #" + Str_conversion::to_string(l.get_part_num())).c_str());
+			locomotor_choice->add((l.get_name() + " -- $" + Str_conversion::to_string(l.get_cost())).c_str());
 		}
 		
 		shop_batteries = shop->get_available_batteries();
@@ -438,7 +438,7 @@ public:
 			battery_choices[i]->clear();
 			for (Battery b : shop_batteries)
 			{
-				battery_choices[i]->add((b.get_name() + " -- #" + Str_conversion::to_string(b.get_part_num())).c_str());
+				battery_choices[i]->add((b.get_name() + " -- $" + Str_conversion::to_string(b.get_cost())).c_str());
 			}
 		}
 
@@ -448,7 +448,7 @@ public:
 			arm_choices[i]->clear();
 			for (Arm a : shop_arms)
 			{
-				arm_choices[i]->add((a.get_name() + " -- #" + Str_conversion::to_string(a.get_part_num())).c_str());
+				arm_choices[i]->add((a.get_name() + " -- $" + Str_conversion::to_string(a.get_cost())).c_str());
 			}
 		}
 	}
@@ -502,6 +502,7 @@ public:
 		radio_groups[2]->position(radio_groups[2]->x(), radio_groups[2]->y() + y_incr);
 		part_cost_display->position(part_cost_display->x(), part_cost_display->y() + y_incr);
 		price_in->resize(price_in->x(), price_in->y() + y_incr, price_in->w(), price_in->h());
+		update_cost();
 	}
 	void hide_extra_battery(int position)
 	{
@@ -544,8 +545,8 @@ public:
 
 				battery_choices[2]->hide();
 			}
-			break;
 		default:
+			update_cost();
 			break;
 		}
 	}
@@ -560,18 +561,23 @@ public:
 		price_in->resize(price_in->x(), price_in->y() + y_incr, price_in->w(), price_in->h());
 
 		arm_choices[1]->show();
+		update_cost();
 	}
 	void hide_extra_arm()
 	{
-		int y_decr = 30;
+		if (arm_choices[1]->visible() != 0)
+		{
+			int y_decr = 30;
 
-		dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() - y_decr);
-		create->position(create->x(), create->y() - y_decr);
-		cancel->position(cancel->x(), cancel->y() - y_decr);
-		part_cost_display->position(part_cost_display->x(), part_cost_display->y() - y_decr);
-		price_in->resize(price_in->x(), price_in->y() - y_decr, price_in->w(), price_in->h());
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() - y_decr);
+			create->position(create->x(), create->y() - y_decr);
+			cancel->position(cancel->x(), cancel->y() - y_decr);
+			part_cost_display->position(part_cost_display->x(), part_cost_display->y() - y_decr);
+			price_in->resize(price_in->x(), price_in->y() - y_decr, price_in->w(), price_in->h());
 
-		arm_choices[1]->hide();
+			arm_choices[1]->hide();
+			update_cost();
+		}
 	}
 
 	void head_chosen()
@@ -581,6 +587,31 @@ public:
 	void torso_chosen()
 	{
 		chose_torso = true;
+		if (shop_torsos[torso_choice->value()].get_battery_compartments() == 1)
+		{
+			hide_extra_battery(1);
+			yes_options[0]->deactivate();
+			yes_options[0]->value(0);
+			no_options[0]->deactivate();
+			no_options[0]->value(0);
+		}
+		else if (shop_torsos[torso_choice->value()].get_battery_compartments() == 2)
+		{
+			hide_extra_battery(2);
+			yes_options[0]->activate();
+			no_options[0]->activate();
+			yes_options[1]->deactivate();
+			yes_options[1]->value(0);
+			no_options[1]->deactivate();
+			no_options[1]->value(0);
+		}
+		else
+		{
+			yes_options[0]->activate();
+			no_options[0]->activate();
+			yes_options[1]->activate();
+			no_options[1]->activate();
+		}
 	}
 	void locomotor_chosen()
 	{
@@ -684,12 +715,13 @@ private:
     vector<Fl_Radio_Round_Button*> no_options;
     vector<Fl_Group*> radio_groups;
     Fl_Box* part_cost_display;
-	string part_cost_display_label = "Total cost of components: $0.00";
     Fl_Float_Input* price_in;
     
     Fl_Return_Button* create;
     Fl_Button* cancel;
     
+	string part_cost_display_label = "Total cost of components: $0.00";
+	//int current_torso_compartments = 3;
     double total_cost;
     bool chose_head = false;
     bool chose_torso = false;
@@ -703,6 +735,7 @@ private:
 	vector<Battery> shop_batteries;
 	vector<Arm> shop_arms;
 };
+//===============================================================================================================================================================
 
 int main()
 {
@@ -719,6 +752,9 @@ int main()
 		{"&Create", 0, 0, 0, FL_SUBMENU },
 			{"Robot &Part", 0, (Fl_Callback*)Open_Robot_Part_DialogCB },
 			{"Robot &Model",0, (Fl_Callback*)Open_Robot_Model_DialogCB },
+			{ 0 },
+		{"&Report", 0, 0, 0, FL_SUBMENU },
+			{"&All Robot Models", 0, (Fl_Callback*)Open_List_Models_DialogCB},
 			{ 0 },
 		{"Debug", 0, 0, 0, FL_SUBMENU },
 			{"Generate Parts", 0, (Fl_Callback*)Debug_Generate_PartsCB },
@@ -773,6 +809,7 @@ int main()
 
 	return(Fl::run());
 }
+//================================================================================================================================================================
 
 void Create_Robot_PartCB(Fl_Widget* w, void* p)
 {
@@ -910,7 +947,9 @@ void Open_Robot_Part_DialogCB(Fl_Widget * w, void * p)
 
 void CloseCB(Fl_Widget* w, void* p)
 {
-	window->hide();
+	int choice = fl_ask("Are you sure you want to quit?\nAll your data will be lost.");
+	if(choice == 1) //Yes
+		window->hide();
 }
 
 void Cancel_Robot_PartCB(Fl_Widget* w, void* p)
@@ -1085,4 +1124,9 @@ void Create_Robot_ModelCB(Fl_Widget * w, void * p)
 void Cancel_Robot_ModelCB(Fl_Widget * w, void * p)
 {
 	robot_model_dlg->hide();
+}
+
+void Open_List_Models_DialogCB(Fl_Widget * w, void * p)
+{
+
 }
