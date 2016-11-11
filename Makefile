@@ -17,7 +17,7 @@ test: robot_part.o head.o arm.o locomotor.o torso.o battery.o helper_functions.o
 	g++ robot_part.o head.o arm.o locomotor.o torso.o battery.o helper_functions.o test.o robot_model.o shop.o
 
 main.o: main.cpp Controller.h
-	$(CXX) -c $(CXXOPTS) $(fltk-config --cxxflags) main.cpp
+	$(CXX) -c $(CXXOPTS) $(fltk-config --cxxflags) main.cpp -Wformat-security -Wdeprecated-declarations -fpermissive -Wint-to-pointer-cast
 test.o: test.cpp
 	g++ -std=c++11 -c test.cpp
 #view.o: View.cpp Robot_Part.h View.h
