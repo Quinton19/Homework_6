@@ -15,6 +15,7 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Counter.H>
 #include <string>
 #include <iostream>
 #include "Shop.h"
@@ -43,11 +44,13 @@ void Cancel_Robot_ModelCB(Fl_Widget* w, void* p);
 void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
+class List_Models_Dialog;
 
 Fl_Window *window;
 Shop *shop;
 Robot_Part_Dialog *robot_part_dlg;
 Robot_Model_Dialog *robot_model_dlg;
+List_Models_Dialog *list_models_dlg;
 
 
 //============================================================================================================================================
@@ -721,7 +724,7 @@ private:
     Fl_Button* cancel;
     
 	string part_cost_display_label = "Total cost of components: $0.00";
-	//int current_torso_compartments = 3;
+
     double total_cost;
     bool chose_head = false;
     bool chose_torso = false;
@@ -737,6 +740,27 @@ private:
 };
 //===============================================================================================================================================================
 
+class List_Models_Dialog
+{
+public:
+	List_Models_Dialog()
+	{
+		dialog = new Fl_Window(500, 500, "List of Current Robot Models");
+
+		
+
+		dialog->end();
+		dialog->set_non_modal();
+	}
+private:
+	Fl_Window* dialog;
+	vector<Fl_Box*> display_models;
+	Fl_Counter* page_number;
+	vector<Fl_Button*> expand_info;
+	Fl_Button* done;
+};
+//===============================================================================================================================================================
+
 int main()
 {
 	const int X = 500;
@@ -744,6 +768,7 @@ int main()
 
 	robot_part_dlg = new Robot_Part_Dialog();
 	robot_model_dlg = new Robot_Model_Dialog();
+	list_models_dlg = new List_Models_Dialog();
 	window = new Fl_Window(X, Y);
 	
 	Fl_Menu_Bar *menubar = new Fl_Menu_Bar(0, 0, X, 30);
