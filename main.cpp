@@ -42,6 +42,7 @@ void No_Another_ArmCB(Fl_Widget* w, void* p);
 void Create_Robot_ModelCB(Fl_Widget* w, void* p);
 void Cancel_Robot_ModelCB(Fl_Widget* w, void* p);
 void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
+void Next_PageCB(Fl_Widget* w, void* p);
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 class List_Models_Dialog;
@@ -745,9 +746,91 @@ class List_Models_Dialog
 public:
 	List_Models_Dialog()
 	{
-		dialog = new Fl_Window(500, 500, "List of Current Robot Models");
+		int x = 120;
+		int y = 10;
+		int w = 210;
+		int h = 75;
+		int y_incr = 100;
 
-		
+		dialog = new Fl_Window(500, 600, "List of Current Robot Models: 1 - 5");
+
+		shop_models = shop->get_models();
+
+		for (int i = 0; i < 5 && i < shop_models.size(); i++)
+		{
+			display_models.push_back(new Fl_Box(x, y, w, h, shop_models[i].to_string().c_str())); y += y_incr;
+			display_models[i]->align(FL_ALIGN_LEFT);
+			dialog->add(display_models[i]);
+		}
+
+		if (shop_models.size() < 5)
+		{
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() - ((5 - shop_models.size()) * y_incr));
+		}
+
+		page_number = new Fl_Counter((dialog->w() / 2) - 20, y, 100, 25, "Page Number");
+		page_number->align(FL_ALIGN_CENTER);
+		page_number->bounds(1, (shop_models.size() / 5) + 1);
+		page_number->precision(1);
+		if (shop_models.size() <= 5)
+			page_number->deactivate();
+
+		done = new Fl_Return_Button(400, y, 100, 25, "Done");
+
+		dialog->end();
+		dialog->set_non_modal();
+	}
+	void show()
+	{
+		construct_list(1);
+		dialog->show();
+	}
+	void hide()
+	{
+		dialog->hide();
+	}
+	void update_models()
+	{
+		shop_models = shop->get_models();
+		model_information.clear();
+		for (Robot_Model rm : shop_models)
+			model_information.push_back(rm.to_string());
+	}
+	void construct_list(int page)
+	{
+		int x = 220;
+		int y = 10;
+		int w = 210;
+		int h = 75;
+		int y_incr = 100;
+
+		int min = (page - 1) * 5;
+		int max = page * 5;
+
+		dialog->begin();
+
+		for (int i = min; i < max && i < shop_models.size(); i++)
+		{
+			if (i < display_models.size())
+			{
+				display_models[i] = new Fl_Box(x, y, w, h, model_information[i].c_str());
+			}
+			else
+				display_models.push_back(new Fl_Box(x, y, w, h, model_information[i].c_str()));
+			y += y_incr;
+			display_models[i]->align(FL_ALIGN_LEFT);
+			dialog->add(display_models[i]);
+		}
+
+		if (shop_models.size() < max)
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), (max - shop_models.size()) * y_incr);
+		else
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 600);
+
+		if (shop_models.size() <= max)
+			page_number->deactivate();
+		else
+			page_number->activate();
 
 		dialog->end();
 		dialog->set_non_modal();
@@ -755,9 +838,11 @@ public:
 private:
 	Fl_Window* dialog;
 	vector<Fl_Box*> display_models;
+	vector<string> model_information;
 	Fl_Counter* page_number;
-	vector<Fl_Button*> expand_info;
-	Fl_Button* done;
+	//vector<Fl_Button*> expand_info;
+	Fl_Return_Button* done;
+	vector<Robot_Model> shop_models;
 };
 //===============================================================================================================================================================
 
@@ -1153,5 +1238,10 @@ void Cancel_Robot_ModelCB(Fl_Widget * w, void * p)
 
 void Open_List_Models_DialogCB(Fl_Widget * w, void * p)
 {
+	list_models_dlg->update_models();
+	list_models_dlg->show();
+}
 
+void Next_PageCB(Fl_Widget * w, void * p)
+{
 }
