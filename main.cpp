@@ -44,6 +44,7 @@ void Cancel_Robot_ModelCB(Fl_Widget* w, void* p);
 void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
 void Next_PageCB(Fl_Widget* w, void* p);
 void DoneCB(Fl_Widget* w, void* p);
+void Debug_Generate_One_ModelCB(Fl_Widget* w, void* p);
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 class List_Models_Dialog;
@@ -748,24 +749,19 @@ class List_Models_Dialog
 public:
 	List_Models_Dialog()
 	{
-		int x = 520;
-		int y = 40;
-		int w = 210;
-		int h = 75;
-		int y_incr = 100;
+		int y = 35;
+		int y_incr = 185;
 
-		dialog = new Fl_Window(500, 700, "List of Current Robot Models: 1 - 4");
-
-		shop_models = shop->get_models();
+		dialog = new Fl_Window(500, 800, "List of Current Robot Models");
 
 		page_number = new Fl_Counter((dialog->w() / 2) - 75, y, 150, 25, "Page Number");
-		page_number->align(FL_ALIGN_CENTER);
-		page_number->bounds(1, 10);
+		page_number->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
 		page_number->precision(0);
+		page_number->step(1);
+		page_number->lstep(page_number->maximum());
 		page_number->value(1);
 		page_number->callback(Next_PageCB);
-		if (shop_models.size() <= 4)
-			page_number->deactivate();
+		page_number->when(FL_WHEN_CHANGED);
 
 		done = new Fl_Return_Button(390, y, 100, 25, "Done");
 		done->callback(DoneCB);
@@ -775,7 +771,9 @@ public:
 	}
 	void show()
 	{
-		construct_list(page_number->value());
+		update_models();
+		construct_list(1);
+		page_number->value(1);
 		dialog->show();
 	}
 	void hide()
@@ -784,71 +782,89 @@ public:
 	}
 	void update_models()
 	{
+		for (int i = 0; i < model_displays.size(); i++)
+		{
+			//fl_message(("hiding " + Str_conversion::to_string(i)).c_str());
+			model_displays[i]->hide();
+			if (dialog->contains(model_displays[i]) == 1)
+				dialog->remove(model_displays[i]);
+		}
+
 		shop_models = shop->get_models();
-		model_information.clear();
-		for (Robot_Model rm : shop_models)
-			model_information.push_back(rm.to_string());
+		model_displays.clear();
+		for (int i = 0; i < shop_models.size(); i++)
+		{
+			model_displays.push_back(new Fl_Multiline_Output(x, 0, w, h));
+			model_displays[i]->insert(shop_models[i].to_string().c_str());
+			model_displays[i]->hide();
+		}
+		if (model_displays.size() % 4 == 0)
+			page_number->bounds(1, (model_displays.size() / 4));
+		else
+			page_number->bounds(1, (model_displays.size() / 4) + 1);
 	}
 	void construct_list(int page)
 	{
-		int x = 375;
-		int y = 65;
-		int w = 210;
-		int h = 75;
-		int y_incr = 175;
-
-		int min = (page - 1) * 4;
+		int y = 15;
+		int y_incr = 185;
 		int max = page * 4;
+		int min = (page - 1) * 4;
 
-		dialog->begin();
-
-		for (int i = min; i < max && i < shop_models.size(); i++)
+		for (int i = 0; i < model_displays.size(); i++)
 		{
-			if (i < display_models.size())
-			{
-				dialog->remove(display_models[i]);
-				display_models[i] = new Fl_Box(x, y, w, h, model_information[i].c_str());
-			}
-			else
-			{
-				display_models.push_back(new Fl_Box(x, y, w, h, model_information[i].c_str()));
-			}
-			y += y_incr;
-			display_models[i]->align(FL_ALIGN_LEFT);
-			dialog->add(display_models[i]);
+			//fl_message(("hiding " + Str_conversion::to_string(i)).c_str());
+			model_displays[i]->hide();
+			if (dialog->contains(model_displays[i]) == 1)
+				dialog->remove(model_displays[i]);
 		}
 
-		//if (shop_models.size() < max)
-		//	dialog->resize(dialog->x(), dialog->y(), dialog->w(), (max - shop_models.size()) * y_incr);
-		//else
-			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800);
+		int i;
+		for (i = min; i < max && i < model_displays.size(); i++)
+		{			
+			model_displays[i]->resize(x, y, w, h);
+			y += y_incr;			
+			model_displays[i]->show();
+			dialog->add(model_displays[i]);
+		}
 
-		if (shop_models.size() <= 4)
-			page_number->deactivate();
+		page_number->resize(page_number->x(), y, page_number->w(), page_number->h());
+		done->resize(done->x(), y, done->w(), done->h());
+
+		if (i != max)
+		{
+			int num_missing = max - model_displays.size(); fl_message(Str_conversion::to_string(num_missing).c_str());
+
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800 - (num_missing * y_incr)); //dialog->redraw();
+			//dialog->free_position();
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800 - (num_missing * y_incr));
+
+			string new_title;
+
+			if (num_missing == 3)
+				new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1);
+			else
+				new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(min + (4 - num_missing));
+
+			dialog->copy_label(new_title.c_str());
+		}
 		else
-			page_number->activate();
-
-		page_number->position(page_number->x(), y - 10);
-		done->position(done->x(), y - 10);
-
-		page_number->bounds(1, (shop_models.size() / 4) + 1);
-		page_number->lstep(page_number->maximum());
-
-		string dialog_label = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(max);
-		dialog->label(dialog_label.c_str());
-
-		dialog->end();
-		dialog->set_non_modal();
+		{
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800);
+			string new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(max);
+			dialog->copy_label(new_title.c_str());
+		}
 	}
 private:
 	Fl_Window* dialog;
-	vector<Fl_Group*> display_models_group;
-	vector<Fl_Box*> display_models;
-	vector<string> model_information;
 	Fl_Counter* page_number;
-	//vector<Fl_Button*> expand_info;
 	Fl_Return_Button* done;
+
+	vector<Fl_Multiline_Output*> model_displays;
 	vector<Robot_Model> shop_models;
+
+	const int x = 90;
+	const int w = 300;
+	const int h = 175;
 };
 //===============================================================================================================================================================
 
@@ -875,6 +891,7 @@ int main()
 		{"Debug", 0, 0, 0, FL_SUBMENU },
 			{"Generate Parts", 0, (Fl_Callback*)Debug_Generate_PartsCB },
 			{"Generate Models", 0, (Fl_Callback*)Debug_Generate_ModelsCB },
+			{"Generate One Model", 0, (Fl_Callback*)Debug_Generate_One_ModelCB},
 			{ 0 },
 		{"&Quit", 0, (Fl_Callback*)CloseCB },
 		{ 0 }
@@ -1158,7 +1175,7 @@ void Debug_Generate_ModelsCB(Fl_Widget * w, void * p)
 {
 	try
 	{
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 12; i++)
 		{
 			try
 			{
@@ -1244,17 +1261,46 @@ void Cancel_Robot_ModelCB(Fl_Widget * w, void * p)
 
 void Open_List_Models_DialogCB(Fl_Widget * w, void * p)
 {
-	list_models_dlg->update_models();
-	list_models_dlg->show();
+	if (shop->get_models().size() > 0)
+	{
+		list_models_dlg->show();
+	}
+	else
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nThere are no models to list.");
+	}
 }
 
 void Next_PageCB(Fl_Widget * w, void * p)
 {
-	Fl_Counter* page_number = (Fl_Counter*)w;
-	list_models_dlg->construct_list(page_number->value());
+	Fl_Counter* page = (Fl_Counter*)w;
+	list_models_dlg->construct_list(page->value());
 }
 
 void DoneCB(Fl_Widget * w, void * p)
 {
 	list_models_dlg->hide();
+}
+
+void Debug_Generate_One_ModelCB(Fl_Widget * w, void * p)
+{
+	try
+	{
+		try
+		{
+			shop->create_rand_model();
+		}
+		catch (Model_Num_Exists& e)
+		{
+			fl_beep(FL_BEEP_DEFAULT);
+			fl_alert("ERROR:\nThat model number already exists!");
+		}
+		fl_message("DEBUG: One random model created.");
+	}
+	catch (Missing_Parts& e)
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nThere are not enough parts registered to create a robot model.");
+	}
 }
