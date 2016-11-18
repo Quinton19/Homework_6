@@ -45,6 +45,7 @@ void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
 void Next_PageCB(Fl_Widget* w, void* p);
 void DoneCB(Fl_Widget* w, void* p);
 void Debug_Generate_One_ModelCB(Fl_Widget* w, void* p);
+void Expand_InfoCB(Fl_Widget* w, void* p);
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 class List_Models_Dialog;
@@ -422,21 +423,21 @@ public:
 		head_choice->clear();
 		for (Head h : shop_heads)
 		{
-			head_choice->add((h.get_name() + " -- $" + Str_conversion::to_string(h.get_cost())).c_str());
+			head_choice->add((h.get_name() + " -- #" + Str_conversion::to_string(h.get_part_num())).c_str());
 		}
 
 		shop_torsos = shop->get_available_torsos();
 		torso_choice->clear();
 		for (Torso t : shop_torsos)
 		{
-			torso_choice->add((t.get_name() + " -- $" + Str_conversion::to_string(t.get_cost())).c_str());
+			torso_choice->add((t.get_name() + " -- #" + Str_conversion::to_string(t.get_part_num())).c_str());
 		}
 
 		shop_locomotors = shop->get_available_locomotors();
 		locomotor_choice->clear();
 		for (Locomotor l : shop_locomotors)
 		{
-			locomotor_choice->add((l.get_name() + " -- $" + Str_conversion::to_string(l.get_cost())).c_str());
+			locomotor_choice->add((l.get_name() + " -- #" + Str_conversion::to_string(l.get_part_num())).c_str());
 		}
 		
 		shop_batteries = shop->get_available_batteries();
@@ -445,7 +446,7 @@ public:
 			battery_choices[i]->clear();
 			for (Battery b : shop_batteries)
 			{
-				battery_choices[i]->add((b.get_name() + " -- $" + Str_conversion::to_string(b.get_cost())).c_str());
+				battery_choices[i]->add((b.get_name() + " -- #" + Str_conversion::to_string(b.get_part_num())).c_str());
 			}
 		}
 
@@ -455,7 +456,7 @@ public:
 			arm_choices[i]->clear();
 			for (Arm a : shop_arms)
 			{
-				arm_choices[i]->add((a.get_name() + " -- $" + Str_conversion::to_string(a.get_cost())).c_str());
+				arm_choices[i]->add((a.get_name() + " -- #" + Str_conversion::to_string(a.get_part_num())).c_str());
 			}
 		}
 	}
@@ -752,7 +753,7 @@ public:
 		int y = 35;
 		int y_incr = 185;
 
-		dialog = new Fl_Window(500, 800, "List of Current Robot Models");
+		dialog = new Fl_Window(500, 900, "List of Current Robot Models");
 
 		page_number = new Fl_Counter((dialog->w() / 2) - 75, y, 150, 25, "Page Number");
 		page_number->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
@@ -784,19 +785,34 @@ public:
 	{
 		for (int i = 0; i < model_displays.size(); i++)
 		{
-			//fl_message(("hiding " + Str_conversion::to_string(i)).c_str());
 			model_displays[i]->hide();
 			if (dialog->contains(model_displays[i]) == 1)
 				dialog->remove(model_displays[i]);
+
+			expand_info[i]->hide();
+			if (dialog->contains(expand_info[i]) == 1)
+				dialog->remove(expand_info[i]);
 		}
 
 		shop_models = shop->get_models();
 		model_displays.clear();
+		expand_info.clear();
 		for (int i = 0; i < shop_models.size(); i++)
 		{
 			model_displays.push_back(new Fl_Multiline_Output(x, 0, w, h));
+
+			string label = Str_conversion::to_string(i + 1) + ".";
+			model_displays[i]->copy_label(label.c_str());
+			model_displays[i]->align(FL_ALIGN_LEFT_TOP);
+
 			model_displays[i]->insert(shop_models[i].to_string().c_str());
+			model_displays[i]->cut(model_displays[i]->position() - 1, model_displays[i]->position()); //deletes the \n at the end of the model's .to_string()
+
 			model_displays[i]->hide();
+
+			expand_info.push_back(new Fl_Button(265, 0, 125, 25, "Additional Info @+"));
+			expand_info[i]->hide();
+			expand_info[i]->callback(Expand_InfoCB, (void*)i);
 		}
 		if (model_displays.size() % 4 == 0)
 			page_number->bounds(1, (model_displays.size() / 4));
@@ -806,16 +822,19 @@ public:
 	void construct_list(int page)
 	{
 		int y = 15;
-		int y_incr = 185;
+		int y_incr = 180;
 		int max = page * 4;
 		int min = (page - 1) * 4;
 
 		for (int i = 0; i < model_displays.size(); i++)
 		{
-			//fl_message(("hiding " + Str_conversion::to_string(i)).c_str());
 			model_displays[i]->hide();
 			if (dialog->contains(model_displays[i]) == 1)
 				dialog->remove(model_displays[i]);
+
+			expand_info[i]->hide();
+			if (dialog->contains(expand_info[i]) == 1)
+				dialog->remove(expand_info[i]);
 		}
 
 		int i;
@@ -825,6 +844,11 @@ public:
 			y += y_incr;			
 			model_displays[i]->show();
 			dialog->add(model_displays[i]);
+
+			expand_info[i]->resize(expand_info[i]->x(), y, expand_info[i]->w(), expand_info[i]->h());
+			y += 30;
+			expand_info[i]->show();
+			dialog->add(expand_info[i]);
 		}
 
 		page_number->resize(page_number->x(), y, page_number->w(), page_number->h());
@@ -832,11 +856,9 @@ public:
 
 		if (i != max)
 		{
-			int num_missing = max - model_displays.size(); fl_message(Str_conversion::to_string(num_missing).c_str());
+			int num_missing = max - model_displays.size();
 
-			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800 - (num_missing * y_incr)); //dialog->redraw();
-			//dialog->free_position();
-			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800 - (num_missing * y_incr));
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 900 - (num_missing * (y_incr + 30)));
 
 			string new_title;
 
@@ -849,7 +871,7 @@ public:
 		}
 		else
 		{
-			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 800);
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 900);
 			string new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(max);
 			dialog->copy_label(new_title.c_str());
 		}
@@ -860,6 +882,7 @@ private:
 	Fl_Return_Button* done;
 
 	vector<Fl_Multiline_Output*> model_displays;
+	vector<Fl_Button*> expand_info;
 	vector<Robot_Model> shop_models;
 
 	const int x = 90;
@@ -1175,7 +1198,7 @@ void Debug_Generate_ModelsCB(Fl_Widget * w, void * p)
 {
 	try
 	{
-		for (int i = 0; i < 12; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			try
 			{
@@ -1302,5 +1325,49 @@ void Debug_Generate_One_ModelCB(Fl_Widget * w, void * p)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
 		fl_alert("ERROR:\nThere are not enough parts registered to create a robot model.");
+	}
+}
+
+void Expand_InfoCB(Fl_Widget * w, void * p)
+{
+	int index = (int)p;
+	vector<Robot_Model> shop_models = shop->get_models();
+
+	string result;
+	result = "Head:\n" + shop_models[index].get_head().to_string()
+		+ "\nTorso:\n" + shop_models[index].get_torso().to_string()
+		+ "\nLocomotor:\n" + shop_models[index].get_locomotor().to_string();
+
+	if(shop_models[index].get_batteries().size() + shop_models[index].get_arms().size() > 3)
+	{
+		if (shop_models[index].get_batteries().size() == 3)
+		{
+			for (int i = 0; i < shop_models[index].get_batteries().size(); i++)
+				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
+			fl_message(result.c_str());
+
+			result = "";
+			for (int i = 0; i < shop_models[index].get_arms().size(); i++)
+				result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
+			fl_message(result.c_str());
+		}
+		else if(shop_models[index].get_batteries().size() == 2)
+		{
+			for (int i = 0; i < shop_models[index].get_batteries().size(); i++)
+				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
+			result += "\nArm 1:\n" + shop_models[index].get_arms()[0].to_string();
+			fl_message(result.c_str());
+
+			result = "Arm 2:\n" + shop_models[index].get_arms()[1].to_string();
+			fl_message(result.c_str());
+		}
+	}
+	else
+	{
+		for (int i = 0; i < shop_models[index].get_batteries().size(); i++)
+			result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
+		for (int i = 0; i < shop_models[index].get_arms().size(); i++)
+			result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
+		fl_message(result.c_str());
 	}
 }
