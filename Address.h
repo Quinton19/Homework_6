@@ -1,12 +1,6 @@
-#include<iostream>
-
-#include<string>
-#include<vector>
-#include<algorithm>
-#include<cmath>
-
 #ifndef ADDRESS_
 #define ADDRESS_ 4320
+#include<string>
 class Address
 {
 public:
