@@ -1,12 +1,5 @@
 #include "Address.h"
 #include "helper_functions.h"
-#include<iostream>
-
-#include<string>
-#include<vector>
-#include<algorithm>
-#include<cmath>
-
 Address::Address(int st_num, string st_name, string city_, string state_, string zip)
 {
 	street_num = st_num;

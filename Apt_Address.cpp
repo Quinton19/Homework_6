@@ -1,11 +1,11 @@
 #include "Apt_Address.h"
-
+#include "helper_functions.h"
 int Apt_Address::get_apt_num()
 {
 	return apt_num;
 }
 
-string to_string()
+string Apt_Address::to_string()
 {
 	string result;
 

@@ -1,6 +1,8 @@
+#include<string>
+using namespace std;
 #ifndef ADDRESS_
 #define ADDRESS_ 4320
-#include<string>
+
 class Address
 {
 public:

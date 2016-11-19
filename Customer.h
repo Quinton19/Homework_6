@@ -17,5 +17,5 @@ private:
 	string name;
 	string email_address;
 	string phone_num;
-	reference_wrapper<Address> address;
+	reference_wrapper<Address>* address;
 };

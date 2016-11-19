@@ -1,9 +1,9 @@
 #include "Customer.h"
 
-Customer::Customer(string name_, Address address_, string phone, string email)
+Customer::Customer(string name_, Address& address_, string phone, string email)
 {
 	name = name_;
-	address = new Address(address_.get_street_num(), address_.get_street_name, 
+	address = new reference_wrapper<Address>{ address_ };
 	phone_num = phone;
 	email_address = email;
 }
