@@ -499,6 +499,92 @@ int main()
 		pass = false;
 		fail_messages += ".create_rand_model() failed\n";
 	}
+	
+	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	//Testing Address
+	Address test_address(1234, "Fake St.", "Imaginary", "QK", "77777-7777");
+    if(test_address.get_street_num() != 1234)
+    {
+        pass = false;
+        fail_messages += ".get_street_num() failed in class Address\n";
+    }
+    if(test_address.get_street_name().compare("Fake St.") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_street_name() failed in class Address\n";
+    }
+    if(test_address.get_city().compare("Imaginary") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_city() failed in class Address\n";
+    }
+    if(test_address.get_state().compare("QK") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_state() failed in class Address\n";
+    }
+    if(test_address.get_zip_code().compare("77777-7777") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_zip_code() failed in class Address\n";
+    }
+    if(test_address.to_string().compare("1234 Fake St.\nImaginary, QK 77777-7777\n") != 0)
+    {
+        pass = false;
+        fail_messages += ".to_string() failed in class Address\n";
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Testing Apt_Address
+    Apt_Address test_address2(5678, "Faux Dr.", "Pretend", "SM", "00000-0000", 91011);
+    if(test_address2.get_apt_num() != 91011)
+    {
+        pass = false;
+        fail_messages += ".get_apt_num() failed in class Apt_Address\n";
+    }
+    if(test_address2.to_string().compare("5678 Faux Dr. Apt. 91011\nPretend, SM 00000-0000\n") != 0)
+    {
+        pass = false;
+        fail_messages += ".to_string() failed in class Apt_Address\n";
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Testing PO_Box_Address
+    PO_Box_Address test_address3(1213, "Synthetic", "FS", "10101-0101");
+    if(test_address3.get_po_box_num() != 1213)
+    {
+        pass = false;
+        fail_messages += ".get_po_box_num() failed in class PO_Box_Address\n";
+    }
+    if(test_address3.to_string().compare("P.O. Box 1213\nSynthetic, FS 10101-0101\n") != 0)
+    {
+        pass = false;
+        fail_messages += ".to_string() failed in class PO_Box_Address\n";
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Testing Customer
+    Customer test_customer("John Smith", test_address3, "(000)000-0000", "not_real@bmail.com");
+    if(test_customer.get_name().compare("John Smith") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_name() failed in class Customer\n";
+    }
+    if(test_customer.get_phone_num().compare("(000)000-0000") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_name() failed in class Customer\n";
+    }
+    if(test_customer.get_email_address().compare("not_real@bmail.com") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_email_address() failed in class Customer\n";
+    }
+    if(test_customer.get_address().get().to_string().compare(test_address3.to_string()) != 0)
+    {
+        pass = false;
+        fail_messages += ".get_address() failed in class Customer\n";
+    }
 
 	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//end of tests

@@ -13,7 +13,7 @@ string Customer::get_name()
 	return name;
 }
 
-Address Customer::get_address()
+reference_wrapper<Address> Customer::get_address()
 {
 	return *address;
 }

@@ -9,7 +9,7 @@ class Customer
 public:
 	Customer(string name_, Address& address_, string phone, string email);
 	string get_name();
-	Address get_address();
+	reference_wrapper<Address> get_address();
 	string get_phone_num();
 	string get_email_address();
 	string to_string();
