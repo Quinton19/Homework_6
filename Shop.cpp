@@ -90,6 +90,10 @@ void Shop::add(Robot_Model model)
 	*/
 }
 
+void Shop::add(Customer new_customer)
+{
+}
+
 vector<Robot_Model> Shop::get_models()
 {
 	return models;
@@ -248,6 +252,10 @@ vector<Arm> Shop::get_available_arms()
 vector<Battery> Shop::get_available_batteries()
 {
 	return batteries;
+}
+vector<Customer> Shop::get_customers()
+{
+	return vector<Customer>();
 }
 /*
 void Shop::remove(Head h)
