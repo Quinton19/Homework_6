@@ -67,6 +67,13 @@ void Open_Sales_Associate_DialogCB(Fl_Widget* w, void* p);
 void Cancel_Sales_AssociateCB(Fl_Widget* w, void* p);
 void Create_Sales_AssociateCB(Fl_Widget* w, void* p);
 
+void Open_Robot_Order_DialogCB(Fl_Widget* w, void* p);
+void Cancel_Robot_OrderCB(Fl_Widget* w, void* p);
+void Create_Robot_OrderCB(Fl_Widget* w, void* p);
+void Selected_ModelCB(Fl_Widget* w, void* p);
+void Selected_Sales_AssociateCB(Fl_Widget* w, void* p);
+void Selected_CustomerCB(Fl_Widget* w, void* p);
+
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 class List_Models_Dialog;
@@ -1209,7 +1216,77 @@ private:
 
 class Robot_Order_Dialog 
 {
+public:
+	Robot_Order_Dialog()
+	{
+		dialog = new Fl_Window(340, 400, "Create a New Robot Order");
 
+		dialog->end();
+		dialog->set_non_modal();
+	}
+	void show()
+	{
+		update();
+		dialog->show();
+	}
+	void hide()
+	{
+		dialog->hide();
+	}
+	void update()
+	{
+
+	}
+
+	Robot_Model get_model()
+	{
+
+	}
+	int get_quantity()
+	{
+
+	}
+	Sales_Associate get_orderer()
+	{
+
+	}
+	Customer get_customer()
+	{
+
+	}
+
+	bool has_empty_fields()
+	{
+
+	}
+
+	void model_chosen()
+	{
+		chose_model = true;
+	}
+	void associate_chosen()
+	{
+		chose_associate = true;
+	}
+	void customer_chosen()
+	{
+		chose_customer = true;
+	}
+private:
+	Fl_Window* dialog;
+	Fl_Choice* robot_models_choice;
+	Fl_Int_Input* quantity_in;
+	Fl_Choice* associate_choice;
+	Fl_Choice* customer_choice;
+	Fl_Return_Button* create;
+	Fl_Button* cancel;
+
+	bool chose_model = false;
+	bool chose_associate = false;
+	bool chose_customer = false;
+	vector<Robot_Model> shop_models;
+	vector<Sales_Associate> shop_associates;
+	vector<Customer> shop_customers;
 };
 //===============================================================================================================================================================
 
@@ -1234,7 +1311,8 @@ int main()
 			{ 0 },
 		{"&New", 0, 0, 0, FL_SUBMENU },
 			{"Robot &Part", 0, (Fl_Callback*)Open_Robot_Part_DialogCB },
-			{"Robot &Model",0, (Fl_Callback*)Open_Robot_Model_DialogCB, 0, FL_MENU_DIVIDER },
+			{"Robot &Model", 0, (Fl_Callback*)Open_Robot_Model_DialogCB },
+			{"Robot &Order", 0, (Fl_Callback*)Open_Robot_Order_DialogCB, 0, FL_MENU_DIVIDER },
 			{"&Customer", 0, (Fl_Callback*)Open_Customer_DialogCB},
 			{"&Sales Associate", 0, (Fl_Callback*)Open_Sales_Associate_DialogCB},
 			{ 0 },
@@ -1842,4 +1920,34 @@ void Create_Sales_AssociateCB(Fl_Widget * w, void * p)
 			}
 		}
 	}
+}
+
+void Open_Robot_Order_DialogCB(Fl_Widget * w, void * p)
+{
+	robot_order_dlg->show();
+}
+
+void Cancel_Robot_OrderCB(Fl_Widget * w, void * p)
+{
+	robot_order_dlg->hide();
+}
+
+void Create_Robot_OrderCB(Fl_Widget * w, void * p)
+{
+
+}
+
+void Selected_ModelCB(Fl_Widget * w, void * p)
+{
+	robot_order_dlg->model_chosen();
+}
+
+void Selected_Sales_AssociateCB(Fl_Widget * w, void * p)
+{
+	robot_order_dlg->associate_chosen();
+}
+
+void Selected_CustomerCB(Fl_Widget * w, void * p)
+{
+	robot_order_dlg->customer_chosen();
 }
