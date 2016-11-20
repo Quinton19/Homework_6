@@ -7,6 +7,8 @@ int Shop::num_rand_torsos = 0;
 int Shop::num_rand_locomotors = 0;
 int Shop::num_rand_arms = 0;
 int Shop::num_rand_batteries = 0;
+int Shop::num_rand_customers = 0;
+int Shop::num_rand_associates = 0;
 
 Shop::Shop()
 {
@@ -247,6 +249,48 @@ void Shop::create_rand_model() //for testing purposes only
 	{
 		num_rand_models--;
 		throw Model_Num_Exists{};
+	}
+}
+
+void Shop::create_rand_customer()
+{
+	int phone1 = rand() % 1000;
+	int phone2 = rand() % 1000;
+	int phone3 = rand() % 10000;
+	int st_num = rand() % 10000;
+	int zip1 = rand() % 100000;
+	int zip2 = rand() % 10000;
+	int rand_num = rand() % 10000000;
+
+	num_rand_customers++;
+
+	Address rand_address(st_num, "Random " + Str_conversion::to_string(num_rand_customers) + " St.", "Random City " + Str_conversion::to_string(num_rand_customers), "RS", Str_conversion::to_string(zip1) + "-" + Str_conversion::to_string(zip2));
+
+	Customer customer("Random Customer " + Str_conversion::to_string(num_rand_customers), rand_address, "(" + Str_conversion::to_string(phone1) + ")" + Str_conversion::to_string(phone2) + "-" + Str_conversion::to_string(phone3), "random_email_" + Str_conversion::to_string(rand_num) + "@sbcrandom.net");
+	try
+	{
+		add(customer);
+	}
+	catch (Customer_Exists& e)
+	{
+		num_rand_models--;
+		throw Customer_Exists{};
+	}
+}
+
+void Shop::create_rand_associate()
+{
+	num_rand_associates++;
+
+	Sales_Associate associate("Random Sales Associate " + Str_conversion::to_string(num_rand_associates), rand() % 100000000);
+	try
+	{
+		add(associate);
+	}
+	catch (Sales_Associate_Exists& e)
+	{
+		num_rand_associates--;
+		throw Sales_Associate_Exists{};
 	}
 }
 

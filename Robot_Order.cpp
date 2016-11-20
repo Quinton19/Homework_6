@@ -45,7 +45,7 @@ string Robot_Order::to_string()
 	string result;
 
 	result = "Date: " + get_order_time() + "\n"
-		+ "Robot Model Ordered:\n" + get_model().get_name() + " -- #" + Str_conversion::to_string(get_model().get_model_num()) + "\n"
+		+ "Robot Model Ordered: " + get_model().get_name() + " -- #" + Str_conversion::to_string(get_model().get_model_num()) + "\n"
 		+ "Amount ordered: " + Str_conversion::to_string(get_quantity()) + "\n"
 		+ "Total amount due: $" + Str_conversion::to_string(get_total_cost()) + "\n"
 		+ "Sales Associate ID: " + Str_conversion::to_string(get_orderer().get_employee_num()) + "\n"

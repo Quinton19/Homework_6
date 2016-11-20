@@ -16,6 +16,8 @@
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Counter.H>
+#include <FL/Fl_Shared_Image.H>
+#include <FL/Fl_PNG_Image.H>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -73,6 +75,9 @@ void Create_Robot_OrderCB(Fl_Widget* w, void* p);
 void Selected_ModelCB(Fl_Widget* w, void* p);
 void Selected_Sales_AssociateCB(Fl_Widget* w, void* p);
 void Selected_CustomerCB(Fl_Widget* w, void* p);
+
+void Debug_Generate_CustomersCB(Fl_Widget* w, void* p);
+void Debug_Generate_Sales_AssociatesCB(Fl_Widget* w, void* p);
 
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
@@ -1219,7 +1224,34 @@ class Robot_Order_Dialog
 public:
 	Robot_Order_Dialog()
 	{
-		dialog = new Fl_Window(340, 400, "Create a New Robot Order");
+		int x = 120;
+		int y = 10;
+		int w = 210;
+		int h = 25;
+		int y_incr = 30;
+
+		dialog = new Fl_Window(340, 160, "Create a New Robot Order");
+
+		robot_model_choice = new Fl_Choice(x, y, w, h, "Robot Model:"); y += y_incr;
+		robot_model_choice->align(FL_ALIGN_LEFT);
+		robot_model_choice->callback(Selected_ModelCB);
+
+		quantity_in = new Fl_Int_Input(x, y, w, h, "Quantity:"); y += y_incr;
+		quantity_in->align(FL_ALIGN_LEFT);
+
+		associate_choice = new Fl_Choice(x, y, w, h, "Sales Associate:"); y += y_incr;
+		associate_choice->align(FL_ALIGN_LEFT);
+		associate_choice->callback(Selected_Sales_AssociateCB);
+
+		customer_choice = new Fl_Choice(x, y, w, h, "Customer:"); y += y_incr;
+		customer_choice->align(FL_ALIGN_LEFT);
+		customer_choice->callback(Selected_CustomerCB);
+
+		create = new Fl_Return_Button(x, y, 125, h, "Place Order");
+		create->callback(Create_Robot_OrderCB);
+
+		cancel = new Fl_Button(x + 150, y, 60, h, "Cancel");
+		cancel->callback(Cancel_Robot_OrderCB);
 
 		dialog->end();
 		dialog->set_non_modal();
@@ -1235,29 +1267,59 @@ public:
 	}
 	void update()
 	{
+		shop_models = shop->get_models();
+		robot_model_choice->clear();
+		for (Robot_Model rm : shop_models)
+		{
+			robot_model_choice->add((rm.get_name() + " -- #" + Str_conversion::to_string(rm.get_model_num())).c_str());
+		}
 
+		shop_associates = shop->get_sales_associates();
+		associate_choice->clear();
+		for (Sales_Associate sa : shop_associates)
+		{
+			associate_choice->add((sa.get_name() + " -- #" + Str_conversion::to_string(sa.get_employee_num())).c_str());
+		}
+
+		shop_customers = shop->get_customers();
+		customer_choice->clear();
+		for (Customer c : shop_customers)
+		{
+			customer_choice->add((c.get_name() + " -- " + c.get_phone_num()).c_str());
+		}
 	}
 
 	Robot_Model get_model()
 	{
-
+		return shop_models[robot_model_choice->value()];
 	}
 	int get_quantity()
 	{
-
+		return atoi(quantity_in->value());
 	}
 	Sales_Associate get_orderer()
 	{
-
+		return shop_associates[associate_choice->value()];
 	}
 	Customer get_customer()
 	{
-
+		return shop_customers[customer_choice->value()];
 	}
 
 	bool has_empty_fields()
 	{
+		bool is_empty = false;
 
+		if (!chose_model)
+			is_empty = true;
+		else if (strcmp(quantity_in->value(), "") == 0)
+			is_empty = true;
+		else if (!chose_associate)
+			is_empty = true;
+		else if (!chose_customer)
+			is_empty = true;
+
+		return is_empty;
 	}
 
 	void model_chosen()
@@ -1274,7 +1336,7 @@ public:
 	}
 private:
 	Fl_Window* dialog;
-	Fl_Choice* robot_models_choice;
+	Fl_Choice* robot_model_choice;
 	Fl_Int_Input* quantity_in;
 	Fl_Choice* associate_choice;
 	Fl_Choice* customer_choice;
@@ -1322,7 +1384,9 @@ int main()
 		{"Debug", 0, 0, 0, FL_SUBMENU },
 			{"Generate Parts", 0, (Fl_Callback*)Debug_Generate_PartsCB },
 			{"Generate Models", 0, (Fl_Callback*)Debug_Generate_ModelsCB },
-			{"Generate One Model", 0, (Fl_Callback*)Debug_Generate_One_ModelCB},
+			{"Generate One Model", 0, (Fl_Callback*)Debug_Generate_One_ModelCB, 0, FL_MENU_DIVIDER},
+			{"Generate Customers", 0, (Fl_Callback*)Debug_Generate_CustomersCB},
+			{"Generate Sales Associates", 0, (Fl_Callback*)Debug_Generate_Sales_AssociatesCB},
 			{ 0 },
 		{ 0 }
 	};
@@ -1924,7 +1988,23 @@ void Create_Sales_AssociateCB(Fl_Widget * w, void * p)
 
 void Open_Robot_Order_DialogCB(Fl_Widget * w, void * p)
 {
-	robot_order_dlg->show();
+	if (shop->get_models().size() == 0)
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nThere are no robot models to order.");
+	}
+	else if (shop->get_sales_associates().size() == 0)
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nThere are no sales associates registered to place an order.");
+	}
+	else if (shop->get_customers().size() == 0)
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nThere are no customers registered to place an order.");
+	}
+	else
+		robot_order_dlg->show();
 }
 
 void Cancel_Robot_OrderCB(Fl_Widget * w, void * p)
@@ -1934,7 +2014,27 @@ void Cancel_Robot_OrderCB(Fl_Widget * w, void * p)
 
 void Create_Robot_OrderCB(Fl_Widget * w, void * p)
 {
+	if (robot_order_dlg->has_empty_fields())
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nNot enough information to create a robot order.");
+	}
+	else
+	{
+		Robot_Model model = robot_order_dlg->get_model();
+		int quantity = robot_order_dlg->get_quantity();
+		Sales_Associate associate = robot_order_dlg->get_orderer();
+		Customer customer = robot_order_dlg->get_customer();
 
+		Robot_Order* order = new Robot_Order(model, quantity, associate, customer);
+		int correct = fl_ask(("Is this correct?\n" + order->to_string()).c_str());
+		if (correct == 1) //Yes
+		{
+			shop->add(*order);
+			fl_message((customer.get_name() + "'s order was successfully placed.").c_str());
+			robot_order_dlg->hide();
+		}
+	}
 }
 
 void Selected_ModelCB(Fl_Widget * w, void * p)
@@ -1950,4 +2050,34 @@ void Selected_Sales_AssociateCB(Fl_Widget * w, void * p)
 void Selected_CustomerCB(Fl_Widget * w, void * p)
 {
 	robot_order_dlg->customer_chosen();
+}
+
+void Debug_Generate_CustomersCB(Fl_Widget * w, void * p)
+{
+	for (int i = 0; i < 15; i++)
+	{
+		try
+		{
+			shop->create_rand_customer();
+		}
+		catch (Part_Num_Exists& e)
+		{
+		}
+	}
+	fl_message("DEBUG: Random customers created.");
+}
+
+void Debug_Generate_Sales_AssociatesCB(Fl_Widget * w, void * p)
+{
+	for (int i = 0; i < 15; i++)
+	{
+		try
+		{
+			shop->create_rand_associate();
+		}
+		catch (Part_Num_Exists& e)
+		{
+		}
+	}
+	fl_message("DEBUG: Random sales associates created.");
 }

@@ -31,6 +31,8 @@ private:
 	static int num_rand_arms;
 	static int num_rand_batteries;
 	static int num_rand_models;
+	static int num_rand_customers;
+	static int num_rand_associates;
 public:
 	Shop();
 	void add(Head h);
@@ -45,6 +47,8 @@ public:
 	vector<Robot_Model> get_models();
 	void create_rand_part(); //for testing purposes only
 	void create_rand_model(); //for testing purposes only
+	void create_rand_customer();
+	void create_rand_associate();
 	vector<Head> get_available_heads();
 	vector<Torso> get_available_torsos();
 	vector<Locomotor> get_available_locomotors();
