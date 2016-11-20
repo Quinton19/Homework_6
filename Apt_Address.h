@@ -1,6 +1,8 @@
 #include "Address.h"
 #include <string>
 
+#ifndef APTADDRESS_
+#define APTADDRESS_ 328
 class Apt_Address : public Address
 {
 public:
@@ -10,3 +12,4 @@ public:
 private:
 	int apt_num;
 };
+#endif

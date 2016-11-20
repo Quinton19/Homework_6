@@ -1,5 +1,7 @@
 #include "Robot_Part.h"
 
+#ifndef BATTERY_
+#define BATTERY_ 4
 class Battery : public Robot_Part
 {
 private:
@@ -9,3 +11,4 @@ public:
 	double get_energy_contained(); //units: kilowatt-hours
 	string to_string();
 };
+#endif

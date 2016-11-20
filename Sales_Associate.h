@@ -2,6 +2,8 @@
 #include "helper_functions.h"
 using namespace std;
 
+#ifndef SALESASSOCIATE_
+#define SALESASSOCIATE_ 1011
 class Sales_Associate
 {
 public:
@@ -15,3 +17,4 @@ private:
 	string name;
 	int employee_num;
 };
+#endif

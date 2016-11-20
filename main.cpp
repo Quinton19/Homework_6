@@ -19,7 +19,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <limits>
 #include "Shop.h"
 
 using namespace std;
@@ -73,15 +72,16 @@ class Robot_Model_Dialog;
 class List_Models_Dialog;
 class Customer_Dialog;
 class Sales_Associate_Dialog;
+class Robot_Order_Dialog;
 
-Fl_Window *window;
-Shop *shop;
-Robot_Part_Dialog *robot_part_dlg;
-Robot_Model_Dialog *robot_model_dlg;
-List_Models_Dialog *list_models_dlg;
-Customer_Dialog *customer_dlg;
-Sales_Associate_Dialog *sales_assoc_dlg;
-
+Fl_Window* window;
+Shop* shop;
+Robot_Part_Dialog* robot_part_dlg;
+Robot_Model_Dialog* robot_model_dlg;
+List_Models_Dialog* list_models_dlg;
+Customer_Dialog* customer_dlg;
+Sales_Associate_Dialog* sales_assoc_dlg;
+Robot_Order_Dialog* robot_order_dlg;
 
 //===============================================================================================================================================================
 class Robot_Part_Dialog
@@ -1206,6 +1206,13 @@ private:
 	Fl_Button* cancel;
 };
 //===============================================================================================================================================================
+
+class Robot_Order_Dialog 
+{
+
+};
+//===============================================================================================================================================================
+
 int main()
 {
 	const int X = 500;
@@ -1216,14 +1223,18 @@ int main()
 	list_models_dlg = new List_Models_Dialog();
 	customer_dlg = new Customer_Dialog();
 	sales_assoc_dlg = new Sales_Associate_Dialog();
+	robot_order_dlg = new Robot_Order_Dialog();
 	window = new Fl_Window(X, Y);
 	
 	Fl_Menu_Bar *menubar = new Fl_Menu_Bar(0, 0, X, 30);
 
 	Fl_Menu_Item menuitems[] = {
+		{"&File", 0, 0, 0, FL_SUBMENU },
+			{"&Quit", 0, (Fl_Callback*)CloseCB },
+			{ 0 },
 		{"&New", 0, 0, 0, FL_SUBMENU },
 			{"Robot &Part", 0, (Fl_Callback*)Open_Robot_Part_DialogCB },
-			{"Robot &Model",0, (Fl_Callback*)Open_Robot_Model_DialogCB },
+			{"Robot &Model",0, (Fl_Callback*)Open_Robot_Model_DialogCB, 0, FL_MENU_DIVIDER },
 			{"&Customer", 0, (Fl_Callback*)Open_Customer_DialogCB},
 			{"&Sales Associate", 0, (Fl_Callback*)Open_Sales_Associate_DialogCB},
 			{ 0 },
@@ -1235,7 +1246,6 @@ int main()
 			{"Generate Models", 0, (Fl_Callback*)Debug_Generate_ModelsCB },
 			{"Generate One Model", 0, (Fl_Callback*)Debug_Generate_One_ModelCB},
 			{ 0 },
-		{"&Quit", 0, (Fl_Callback*)CloseCB },
 		{ 0 }
 	};
 

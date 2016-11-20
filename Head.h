@@ -1,5 +1,7 @@
 #include "Robot_Part.h"
 
+#ifndef HEAD_
+#define HEAD_ 112216
 class Head : public Robot_Part
 {
 private:
@@ -8,3 +10,4 @@ public:
 	Head();
 	string to_string();
 };
+#endif

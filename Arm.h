@@ -1,5 +1,7 @@
 #include "Robot_Part.h"
 
+#ifndef ARM_
+#define ARM_ 7
 class Arm : public Robot_Part
 {
 private:
@@ -9,3 +11,4 @@ public:
 	double get_power_consumed(); //units: watts
 	string to_string();
 };
+#endif

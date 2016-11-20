@@ -1,6 +1,7 @@
 #include "Robot_Model.h"
 #include "Customer.h"
 #include "Sales_Associate.h"
+#include "Robot_Order.h"
 
 class Part_Num_Exists {};
 class Model_Num_Exists {};
@@ -23,6 +24,7 @@ private:
 	vector<Battery> batteries;
 	vector<Customer> customers;
 	vector<Sales_Associate> sales_associates;
+	vector<Robot_Order> orders;
 	static int num_rand_heads;
 	static int num_rand_torsos;
 	static int num_rand_locomotors;
@@ -39,6 +41,7 @@ public:
 	void add(Robot_Model model);
 	void add(Customer new_customer);
 	void add(Sales_Associate new_associate);
+	void add(Robot_Order new_order);
 	vector<Robot_Model> get_models();
 	void create_rand_part(); //for testing purposes only
 	void create_rand_model(); //for testing purposes only
@@ -49,6 +52,7 @@ public:
 	vector<Battery> get_available_batteries();
 	vector<Customer> get_customers();
 	vector<Sales_Associate> get_sales_associates();
+	vector<Robot_Order> get_orders();
 	/*
 	void remove(Head h);
 	void remove(Torso t);

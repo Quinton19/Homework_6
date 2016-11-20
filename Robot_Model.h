@@ -4,6 +4,8 @@
 #include "Torso.h"
 #include "Locomotor.h"
 
+#ifndef ROBOTMODEL_
+#define ROBOTMODEL_ 111916
 class Arm_Limit {};
 class Battery_Limit {};
 
@@ -34,3 +36,4 @@ public:
 	string to_string();
 	double get_component_cost();
 };
+#endif

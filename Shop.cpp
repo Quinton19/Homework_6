@@ -110,6 +110,11 @@ void Shop::add(Sales_Associate new_associate)
 	sales_associates.push_back(new_associate);
 }
 
+void Shop::add(Robot_Order new_order)
+{
+	orders.push_back(new_order);
+}
+
 vector<Robot_Model> Shop::get_models()
 {
 	return models;
@@ -276,6 +281,10 @@ vector<Customer> Shop::get_customers()
 vector<Sales_Associate> Shop::get_sales_associates()
 {
 	return sales_associates;
+}
+vector<Robot_Order> Shop::get_orders()
+{
+	return orders;
 }
 /*
 void Shop::remove(Head h)

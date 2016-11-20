@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 
+#ifndef CUSTOMER_
+#define CUSTOMER_ 101010
 class Customer
 {
 public:
@@ -21,3 +23,4 @@ private:
 	string phone_num;
 	reference_wrapper<Address>* address;
 };
+#endif

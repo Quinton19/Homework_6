@@ -1,5 +1,7 @@
 #include "Address.h"
 
+#ifndef POBOXADDRESS_
+#define POBOXADDRESS_ 112416
 class PO_Box_Address : public Address
 {
 public:
@@ -9,3 +11,4 @@ public:
 private:
 	int po_box;
 };
+#endif

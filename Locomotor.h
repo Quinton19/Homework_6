@@ -1,5 +1,7 @@
 #include "Robot_Part.h"
 
+#ifndef LOCOMOTOR_
+#define LOCOMOTOR_ 122516
 class Locomotor : public Robot_Part
 {
 private:
@@ -12,3 +14,4 @@ public:
 	double get_power_consumed(); //units: watts
 	string to_string();
 };
+#endif
