@@ -18,6 +18,8 @@
 #include <FL/Fl_Counter.H>
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <limits>
 #include "Shop.h"
 
 using namespace std;
@@ -25,6 +27,7 @@ using namespace std;
 void Create_Robot_PartCB(Fl_Widget* w, void* p);
 void Open_Robot_Part_DialogCB(Fl_Widget* w, void* p);
 void CloseCB(Fl_Widget* w, void* p);
+
 void Cancel_Robot_PartCB(Fl_Widget* w, void* p);
 void Selected_Part_TypeCB(Fl_Widget* w, void* p);
 void Selected_CompartmentsCB(Fl_Widget* w, void* p);
@@ -34,31 +37,53 @@ void Selected_TorsoCB(Fl_Widget* w, void* p);
 void Selected_LocomotorCB(Fl_Widget* w, void* p);
 void Selected_BatteryCB(Fl_Widget* w, void* p);
 void Selected_ArmCB(Fl_Widget* w, void* p);
+
 void Debug_Generate_PartsCB(Fl_Widget* w, void* p);
 void Debug_Generate_ModelsCB(Fl_Widget* w, void* p);
+
 void Yes_Another_BatteryCB(Fl_Widget* w, void* p);
 void No_Another_BatteryCB(Fl_Widget* w, void* p);
 void Yes_Another_ArmCB(Fl_Widget* w, void* p);
 void No_Another_ArmCB(Fl_Widget* w, void* p);
+
 void Create_Robot_ModelCB(Fl_Widget* w, void* p);
 void Cancel_Robot_ModelCB(Fl_Widget* w, void* p);
+
 void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
 void Next_PageCB(Fl_Widget* w, void* p);
 void DoneCB(Fl_Widget* w, void* p);
+
 void Debug_Generate_One_ModelCB(Fl_Widget* w, void* p);
+
 void Expand_InfoCB(Fl_Widget* w, void* p);
+
+void Open_Customer_DialogCB(Fl_Widget* w, void* p);
+void Cancel_CustomerCB(Fl_Widget* w, void* p);
+void Apartment_AddressCB(Fl_Widget* w, void* p);
+void PO_Box_AddressCB(Fl_Widget* w, void* p);
+void Regular_AddressCB(Fl_Widget* w, void* p);
+void Create_CustomerCB(Fl_Widget* w, void* p);
+
+void Open_Sales_Associate_DialogCB(Fl_Widget* w, void* p);
+void Cancel_Sales_AssociateCB(Fl_Widget* w, void* p);
+void Create_Sales_AssociateCB(Fl_Widget* w, void* p);
+
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 class List_Models_Dialog;
+class Customer_Dialog;
+class Sales_Associate_Dialog;
 
 Fl_Window *window;
 Shop *shop;
 Robot_Part_Dialog *robot_part_dlg;
 Robot_Model_Dialog *robot_model_dlg;
 List_Models_Dialog *list_models_dlg;
+Customer_Dialog *customer_dlg;
+Sales_Associate_Dialog *sales_assoc_dlg;
 
 
-//============================================================================================================================================
+//===============================================================================================================================================================
 class Robot_Part_Dialog
 {
 public:
@@ -301,7 +326,7 @@ private:
     bool chose_type = false;
     bool chose_compartment_num = false;
 };
-//==========================================================================================================================================================
+//===============================================================================================================================================================
 
 class Robot_Model_Dialog
 {
@@ -892,6 +917,295 @@ private:
 };
 //===============================================================================================================================================================
 
+class Customer_Dialog
+{
+public:
+	Customer_Dialog()
+	{
+		int x = 120;
+		int y = 10;
+		int w = 210;
+		int h = 25;
+		int y_incr = 30;
+
+		dialog = new Fl_Window(340, 330, "Add a New Customer");
+
+		name_in = new Fl_Input(x, y, w, h, "Name:"); y += y_incr;
+		name_in->align(FL_ALIGN_LEFT);
+
+		phone_num_in = new Fl_Input(x, y, w, h, "Phone Number:"); y += y_incr;
+		phone_num_in->align(FL_ALIGN_LEFT);
+
+		email_in = new Fl_Input(x, y, w, h, "Email Address:"); y += y_incr;
+		email_in->align(FL_ALIGN_LEFT);
+
+		y += 20;
+
+		apt_po_choices = new Fl_Group(0, y, dialog->w(), h, "Is this address a PO box or an apartment address?");
+		apt_po_choices->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+		is_apt = new Fl_Radio_Round_Button(40, y, 40, h, "Apartment");
+		is_apt->callback(Apartment_AddressCB);
+		is_po = new Fl_Radio_Round_Button(150, y, 40, h, "PO Box");
+		is_po->callback(PO_Box_AddressCB);
+		neither = new Fl_Radio_Round_Button(250, y, 40, h, "Neither");
+		neither->callback(Regular_AddressCB);
+		apt_po_choices->end();
+		
+		y += y_incr;
+
+		st_num_in = new Fl_Int_Input(x, y, w, h, "House/Building\nNumber:"); y += y_incr;
+		st_num_in->align(FL_ALIGN_LEFT);
+
+		st_name_in = new Fl_Input(x, y, w, h, "Street Name:"); y += y_incr;
+		st_name_in->align(FL_ALIGN_LEFT);
+
+		apt_num_in = new Fl_Int_Input(x, y, w, h, "Apartment\nNumber:");
+		apt_num_in->align(FL_ALIGN_LEFT);
+		apt_num_in->hide();
+
+		city_in = new Fl_Input(x, y, w, h, "City:"); y += y_incr;
+		city_in->align(FL_ALIGN_LEFT);
+
+		state_in = new Fl_Input(x, y, w, h, "State:"); y += y_incr;
+		state_in->align(FL_ALIGN_LEFT);
+
+		zip_in = new Fl_Input(x, y, w, h, "ZIP Code:"); y += y_incr;
+		zip_in->align(FL_ALIGN_LEFT);
+
+		create = new Fl_Return_Button(120, y, 100, h, "Add");
+		create->callback(Create_CustomerCB);
+
+		cancel = new Fl_Button(230, y, 100, h, "Cancel");
+		cancel->callback(Cancel_CustomerCB);
+		//dialog->resizable(dialog);
+		dialog->end();
+		dialog->set_non_modal();
+	}
+	void show()
+	{
+		dialog->show();
+	}
+	void hide()
+	{
+		dialog->hide();
+	}
+	void apt_address()
+	{
+		int y_incr = 30;
+
+		regular_address();
+
+		apt_num_in->show();
+		city_in->resize(city_in->x(), city_in->y() + y_incr, city_in->w(), city_in->h());
+		state_in->resize(state_in->x(), state_in->y() + y_incr, state_in->w(), state_in->h());
+		zip_in->resize(zip_in->x(), zip_in->y() + y_incr, zip_in->w(), zip_in->h());
+		create->resize(create->x(), create->y() + y_incr, create->w(), create->h());
+		cancel->resize(cancel->x(), cancel->y() + y_incr, cancel->w(), cancel->h());
+		dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() + y_incr);
+	}
+	void po_box_address()
+	{
+		int y_decr = 30;
+
+		regular_address();
+
+		st_num_in->label("PO Box Num:");
+		st_name_in->hide();
+		city_in->resize(city_in->x(), city_in->y() - y_decr, city_in->w(), city_in->h());
+		state_in->resize(state_in->x(), state_in->y() - y_decr, state_in->w(), state_in->h());
+		zip_in->resize(zip_in->x(), zip_in->y() - y_decr, zip_in->w(), zip_in->h());
+		create->resize(create->x(), create->y() - y_decr, create->w(), create->h());
+		cancel->resize(cancel->x(), cancel->y() - y_decr, cancel->w(), cancel->h());
+		dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() - y_decr);
+	}
+	void regular_address()
+	{
+		int y_decr = 30;
+		int y_incr = 30;
+
+		if (apt_num_in->visible() != 0) //if the field for the apartment number input is visible
+		{
+			apt_num_in->hide();
+			city_in->resize(city_in->x(), city_in->y() - y_decr, city_in->w(), city_in->h());
+			state_in->resize(state_in->x(), state_in->y() - y_decr, state_in->w(), state_in->h());
+			zip_in->resize(zip_in->x(), zip_in->y() - y_decr, zip_in->w(), zip_in->h());
+			create->resize(create->x(), create->y() - y_decr, create->w(), create->h());
+			cancel->resize(cancel->x(), cancel->y() - y_decr, cancel->w(), cancel->h());
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() - y_decr);
+		}
+		else if (st_name_in->visible() == 0) //if the field for the street name input is invisible
+		{
+			st_name_in->show();
+			city_in->resize(city_in->x(), city_in->y() + y_incr, city_in->w(), city_in->h());
+			state_in->resize(state_in->x(), state_in->y() + y_incr, state_in->w(), state_in->h());
+			zip_in->resize(zip_in->x(), zip_in->y() + y_incr, zip_in->w(), zip_in->h());
+			create->resize(create->x(), create->y() + y_incr, create->w(), create->h());
+			cancel->resize(cancel->x(), cancel->y() + y_incr, cancel->w(), cancel->h());
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), dialog->h() + y_incr);
+			st_num_in->label("House/Building\nNumber:");
+		}
+	}
+
+	string get_name()
+	{
+		return name_in->value();
+	}
+	string get_phone_num()
+	{
+		return phone_num_in->value();
+	}
+	string get_email_address()
+	{
+		return email_in->value();
+	}
+	reference_wrapper<Address> get_address_ref()
+	{
+		string city = city_in->value();
+		string state = state_in->value();
+		string zip = zip_in->value();
+
+		if (is_apt->value() == 1)  //selected apartment address option
+		{
+			int st_num = atoi(st_num_in->value());
+			string st_name = st_name_in->value();
+			int apt_num = atoi(apt_num_in->value());
+
+			Apt_Address* address = new Apt_Address(st_num, st_name, city, state, zip, apt_num);
+			reference_wrapper<Address> address_ref{ *address };
+			return address_ref;
+		}
+		else if (is_po->value() == 1)  //selected po box address option
+		{
+			int po_box_num = atoi(st_num_in->value());
+
+			PO_Box_Address* address = new PO_Box_Address(po_box_num, city, state, zip);
+			reference_wrapper<Address> address_ref{ *address };
+			return address_ref;
+		}
+		else
+		{
+			int st_num = atoi(st_num_in->value());
+			string st_name = st_name_in->value();
+
+			Address* address = new Address(st_num, st_name, city, state, zip);
+			reference_wrapper<Address> address_ref{ *address };
+			return address_ref;
+		}
+	}
+
+	bool has_empty_fields()
+	{
+		bool is_empty = false;
+
+		if (strcmp(name_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(phone_num_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(email_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(st_num_in->value(), "") == 0)
+			is_empty = true;
+		else if (is_po->value() == 0 && strcmp(st_name_in->value(), "") == 0)
+			is_empty = true;
+		else if (is_apt->value() == 1 && strcmp(apt_num_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(city_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(state_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(zip_in->value(), "") == 0)
+			is_empty = true;
+
+		return is_empty;
+	}
+private:
+	Fl_Window* dialog;
+	Fl_Input* name_in;
+	Fl_Input* phone_num_in;
+	Fl_Input* email_in;
+	Fl_Int_Input* st_num_in;
+	Fl_Input* st_name_in;
+	Fl_Input* city_in;
+	Fl_Input* state_in;
+	Fl_Input* zip_in;
+
+	Fl_Group* apt_po_choices;
+	Fl_Radio_Round_Button* is_apt;
+	Fl_Radio_Round_Button* is_po;
+	Fl_Radio_Round_Button* neither;
+
+	Fl_Int_Input* apt_num_in;
+
+	Fl_Return_Button* create;
+	Fl_Button* cancel;
+};
+//===============================================================================================================================================================
+
+class Sales_Associate_Dialog
+{
+public:
+	Sales_Associate_Dialog()
+	{
+		int x = 130;
+		int y = 10;
+		int w = 210;
+		int h = 25;
+		int y_incr = 30;
+
+		dialog = new Fl_Window(350, 100, "Add a Sales Associate");
+
+		name_in = new Fl_Input(x, y, w, h, "Name:"); y += y_incr;
+		name_in->align(FL_ALIGN_LEFT);
+
+		emp_num_in = new Fl_Int_Input(x, y, w, h, "Employee Number:"); y += y_incr;
+		emp_num_in->align(FL_ALIGN_LEFT);
+
+		create = new Fl_Return_Button(x + 20, y, 100, h, "Add");
+		create->callback(Create_Sales_AssociateCB);
+
+		cancel = new Fl_Button(x + 135, y, 75, h, "Cancel");
+		cancel->callback(Cancel_Sales_AssociateCB);
+
+		dialog->end();
+		dialog->set_non_modal();
+	}
+	void show()
+	{
+		dialog->show();
+	}
+	void hide()
+	{
+		dialog->hide();
+	}
+
+	string get_name()
+	{
+		return name_in->value();
+	}
+	int get_employee_num()
+	{
+		return atoi(emp_num_in->value());
+	}
+
+	bool has_empty_fields()
+	{
+		bool is_empty = false;
+
+		if (strcmp(name_in->value(), "") == 0)
+			is_empty = true;
+		else if (strcmp(emp_num_in->value(), "") == 0)
+			is_empty = true;
+
+		return is_empty;
+	}
+private:
+	Fl_Window* dialog;
+	Fl_Input* name_in;
+	Fl_Int_Input* emp_num_in;
+	Fl_Return_Button* create;
+	Fl_Button* cancel;
+};
+//===============================================================================================================================================================
 int main()
 {
 	const int X = 500;
@@ -900,14 +1214,18 @@ int main()
 	robot_part_dlg = new Robot_Part_Dialog();
 	robot_model_dlg = new Robot_Model_Dialog();
 	list_models_dlg = new List_Models_Dialog();
+	customer_dlg = new Customer_Dialog();
+	sales_assoc_dlg = new Sales_Associate_Dialog();
 	window = new Fl_Window(X, Y);
 	
 	Fl_Menu_Bar *menubar = new Fl_Menu_Bar(0, 0, X, 30);
 
 	Fl_Menu_Item menuitems[] = {
-		{"&Create", 0, 0, 0, FL_SUBMENU },
+		{"&New", 0, 0, 0, FL_SUBMENU },
 			{"Robot &Part", 0, (Fl_Callback*)Open_Robot_Part_DialogCB },
 			{"Robot &Model",0, (Fl_Callback*)Open_Robot_Model_DialogCB },
+			{"&Customer", 0, (Fl_Callback*)Open_Customer_DialogCB},
+			{"&Sales Associate", 0, (Fl_Callback*)Open_Sales_Associate_DialogCB},
 			{ 0 },
 		{"&Report", 0, 0, 0, FL_SUBMENU },
 			{"&All Robot Models", 0, (Fl_Callback*)Open_List_Models_DialogCB},
@@ -1370,5 +1688,148 @@ void Expand_InfoCB(Fl_Widget * w, void * p)
 		for (int i = 0; i < shop_models[index].get_arms().size(); i++)
 			result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
 		fl_message(result.c_str());
+	}
+}
+
+void Open_Customer_DialogCB(Fl_Widget * w, void * p)
+{
+	customer_dlg->show();
+}
+
+void Cancel_CustomerCB(Fl_Widget * w, void * p)
+{
+	customer_dlg->hide();
+}
+
+void Apartment_AddressCB(Fl_Widget * w, void * p)
+{
+	customer_dlg->apt_address();
+}
+
+void PO_Box_AddressCB(Fl_Widget * w, void * p)
+{
+	customer_dlg->po_box_address();
+}
+
+void Regular_AddressCB(Fl_Widget * w, void * p)
+{
+	customer_dlg->regular_address();
+}
+
+void Create_CustomerCB(Fl_Widget * w, void * p)
+{
+	if (customer_dlg->has_empty_fields())
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nNot enough information to create a customer.");
+	}
+	else
+	{
+		string name = customer_dlg->get_name();
+		string phone_num = customer_dlg->get_phone_num();
+		string email_address = customer_dlg->get_email_address();
+		reference_wrapper<Address> address_ref = customer_dlg->get_address_ref();
+
+		Customer* new_customer = new Customer(name, address_ref, phone_num, email_address);
+		
+		// Note: This section is for properly formatting the customer's .to_string() output. If the 2nd @ symbol is not added, then FLTK will stop printing once it reaches it.
+		// This section also checks to make sure any entered email address has one and only one @ symbol.
+		stringstream adding_at;
+		string result;
+		bool found_at = false;
+		bool found_2nd_at = false;
+		adding_at << new_customer->to_string();
+		while (adding_at)
+		{
+			char current = adding_at.get();
+			if (current == '@')
+			{
+				if (found_at)
+				{
+					fl_beep(FL_BEEP_DEFAULT);
+					fl_alert("ERROR:\nThe entered email is invalid!");
+					found_2nd_at = true;
+				}
+				else
+					found_at = true;
+
+				int pos = adding_at.tellg();
+				result = adding_at.str().insert(pos, 1, '@');
+				adding_at.unget();
+				adding_at.ignore();
+			}
+			else
+			{
+				adding_at.unget();
+				adding_at.ignore();
+			}
+			
+		}
+
+		if (found_at && !found_2nd_at)
+		{
+			int correct = fl_ask(("Is this correct?\n" + result).c_str());
+			if (correct == 1) //Yes
+			{
+				try
+				{
+					shop->add(*new_customer);
+					fl_message((name + " was successfully added.").c_str());
+					customer_dlg->hide();
+				}
+				catch (Customer_Exists& e)
+				{
+					fl_beep(FL_BEEP_DEFAULT);
+					fl_alert("ERROR:\nThat customer already exists!");
+				}
+			}
+		}
+		else if (!found_at)
+		{
+			fl_beep(FL_BEEP_DEFAULT);
+			fl_alert("ERROR:\nThe entered email is invalid!");
+		}
+
+	}
+}
+
+void Open_Sales_Associate_DialogCB(Fl_Widget * w, void * p)
+{
+	sales_assoc_dlg->show();
+}
+
+void Cancel_Sales_AssociateCB(Fl_Widget * w, void * p)
+{
+	sales_assoc_dlg->hide();
+}
+
+void Create_Sales_AssociateCB(Fl_Widget * w, void * p)
+{
+	if (sales_assoc_dlg->has_empty_fields())
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nNot enough information to create a sales associate.");
+	}
+	else
+	{
+		string name = sales_assoc_dlg->get_name();
+		int employee_num = sales_assoc_dlg->get_employee_num();
+
+		Sales_Associate* new_associate = new Sales_Associate(name, employee_num);
+		int correct = fl_ask(("Is this correct?\n" + new_associate->to_string()).c_str());
+		if (correct == 1) //Yes
+		{
+			try
+			{
+				shop->add(*new_associate);
+				fl_message((name + " was successfully added.").c_str());
+				sales_assoc_dlg->hide();
+			}
+			catch (Sales_Associate_Exists& e)
+			{
+				fl_beep(FL_BEEP_DEFAULT);
+				fl_alert("ERROR:\nThat employee number already exists!");
+			}
+		}
 	}
 }

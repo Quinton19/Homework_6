@@ -8,11 +8,13 @@ class Customer
 {
 public:
 	Customer(string name_, Address& address_, string phone, string email);
-	string get_name();
-	reference_wrapper<Address> get_address();
-	string get_phone_num();
-	string get_email_address();
+	string get_name() const;
+	reference_wrapper<Address> get_address_ref() const;
+	string get_phone_num() const;
+	string get_email_address() const;
 	string to_string();
+	bool operator==(const Customer& other);
+	bool operator!=(const Customer& other);
 private:
 	string name;
 	string email_address;

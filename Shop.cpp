@@ -92,6 +92,22 @@ void Shop::add(Robot_Model model)
 
 void Shop::add(Customer new_customer)
 {
+	for (Customer c : customers)
+	{
+		if (new_customer == c)
+			throw Customer_Exists{};
+	}
+	customers.push_back(new_customer);
+}
+
+void Shop::add(Sales_Associate new_associate)
+{
+	for (Sales_Associate s : sales_associates)
+	{
+		if (new_associate == s)
+			throw Sales_Associate_Exists{};
+	}
+	sales_associates.push_back(new_associate);
 }
 
 vector<Robot_Model> Shop::get_models()
@@ -255,7 +271,11 @@ vector<Battery> Shop::get_available_batteries()
 }
 vector<Customer> Shop::get_customers()
 {
-	return vector<Customer>();
+	return customers;
+}
+vector<Sales_Associate> Shop::get_sales_associates()
+{
+	return sales_associates;
 }
 /*
 void Shop::remove(Head h)
