@@ -1592,7 +1592,7 @@ void Create_Robot_PartCB(Fl_Widget* w, void* p)
     if(robot_part_dlg->has_empty_fields())
     {
 		fl_beep(FL_BEEP_DEFAULT);
-        fl_alert("ERROR:\nNot enough information to create a robot part");
+        fl_alert("%s","ERROR:\nNot enough information to create a robot part");
     }
     else
     {
@@ -1610,19 +1610,19 @@ void Create_Robot_PartCB(Fl_Widget* w, void* p)
         if(robot_part_dlg->get_type() == Component_type::Head)
         {
             head = new Head(name, part_num, weight, cost, description);
-            int correct = fl_ask(("Is this correct?\n" + head->to_string()).c_str());
+            int correct = fl_ask("%s",("Is this correct?\n" + head->to_string()).c_str());
             if(correct == 1) //Yes
             {
                 try
                 {
                     shop->add(*head);
-                    fl_message((name + " was successfully added.").c_str());
+                    fl_message("%s",(name + " was successfully added.").c_str());
                     robot_part_dlg->hide();
                 }
                 catch(Part_Num_Exists& e)
                 {
 					fl_beep(FL_BEEP_DEFAULT);
-                    fl_alert("ERROR:\nThat part number already exists!");
+                    fl_alert("%s","ERROR:\nThat part number already exists!");
                 }
             }
         }
@@ -1631,19 +1631,19 @@ void Create_Robot_PartCB(Fl_Widget* w, void* p)
             int num_batt_compartments = robot_part_dlg->get_num_compartments();
             
             torso = new Torso(name, part_num, weight, cost, description, num_batt_compartments);
-            int correct = fl_ask(("Is this correct?\n" + torso->to_string()).c_str());
+            int correct = fl_ask("%s",("Is this correct?\n" + torso->to_string()).c_str());
             if(correct == 1) //Yes
             {
                 try
                 {
                     shop->add(*torso);
-                    fl_message((name + " was successfully added.").c_str());
+                    fl_message("%s",(name + " was successfully added.").c_str());
                     robot_part_dlg->hide();
                 }
                 catch(Part_Num_Exists& e)
                 {
 					fl_beep(FL_BEEP_DEFAULT);
-                    fl_alert("ERROR:\nThat part number already exists!");
+                    fl_alert("%s","ERROR:\nThat part number already exists!");
                 }
             }
         }
@@ -1653,19 +1653,19 @@ void Create_Robot_PartCB(Fl_Widget* w, void* p)
             int speed = robot_part_dlg->get_speed();
             
             locomotor = new Locomotor(name, part_num, weight, cost, description, speed, pwr_consumed);
-            int correct = fl_ask(("Is this correct?\n" + locomotor->to_string()).c_str());
+            int correct = fl_ask("%s",("Is this correct?\n" + locomotor->to_string()).c_str());
             if(correct == 1) //Yes
             {
                 try
                 {
                     shop->add(*locomotor);
-                    fl_message((name + " was successfully added.").c_str());
+                    fl_message("%s",(name + " was successfully added.").c_str());
                     robot_part_dlg->hide();
                 }
                 catch(Part_Num_Exists& e)
                 {
 					fl_beep(FL_BEEP_DEFAULT);
-                    fl_alert("ERROR:\nThat part number already exists!");
+                    fl_alert("%s","ERROR:\nThat part number already exists!");
                 }
             }
         }
@@ -1674,19 +1674,19 @@ void Create_Robot_PartCB(Fl_Widget* w, void* p)
             double energy = robot_part_dlg->get_energy();
             
             battery = new Battery(name, part_num, weight, cost, description, energy);
-            int correct = fl_ask(("Is this correct?\n" + battery->to_string()).c_str());
+            int correct = fl_ask("%s",("Is this correct?\n" + battery->to_string()).c_str());
             if(correct == 1) //Yes
             {
                 try
                 {
                     shop->add(*battery);
-                    fl_message((name + " was successfully added.").c_str());
+                    fl_message("%s",(name + " was successfully added.").c_str());
                     robot_part_dlg->hide();
                 }
                 catch(Part_Num_Exists& e)
                 {
 					fl_beep(FL_BEEP_DEFAULT);
-                    fl_alert("ERROR:\nThat part number already exists!");
+                    fl_alert("%s","ERROR:\nThat part number already exists!");
                 }
             }
         }
@@ -1695,19 +1695,19 @@ void Create_Robot_PartCB(Fl_Widget* w, void* p)
             double pwr_consumed = robot_part_dlg->get_power_consumed();
             
             arm = new Arm(name, part_num, weight, cost, description, pwr_consumed);
-            int correct = fl_ask(("Is this correct?\n" + arm->to_string()).c_str());
+            int correct = fl_ask("%s",("Is this correct?\n" + arm->to_string()).c_str());
             if(correct == 1) //Yes
             {
                 try
                 {
                     shop->add(*arm);
-                    fl_message((name + " was successfully added.").c_str());
+                    fl_message("%s",(name + " was successfully added.").c_str());
                     robot_part_dlg->hide();
                 }
                 catch(Part_Num_Exists& e)
                 {
 					fl_beep(FL_BEEP_DEFAULT);
-                    fl_alert("ERROR:\nThat part number already exists!");
+                    fl_alert("%s","ERROR:\nThat part number already exists!");
                 }
             }
         }
@@ -1723,7 +1723,7 @@ void Open_Robot_Part_DialogCB(Fl_Widget * w, void * p)
 
 void CloseCB(Fl_Widget* w, void* p)
 {
-	int choice = fl_ask("Are you sure you want to quit?\nAll your data will be lost.");
+	int choice = fl_ask("%s","Are you sure you want to quit?\nAll your data will be lost.");
 	if(choice == 1) //Yes
 		window->hide();
 }
@@ -1760,7 +1760,7 @@ void Open_Robot_Model_DialogCB(Fl_Widget* w, void* p)
 		|| shop->get_available_arms().size() == 0 || shop->get_available_batteries().size() == 0)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are not enough parts registered to create a robot model.\nPlease add more parts and try again.");
+		fl_alert("%s","ERROR:\nThere are not enough parts registered to create a robot model.\nPlease add more parts and try again.");
 	}
 	else
         robot_model_dlg->show();
@@ -1810,7 +1810,7 @@ void Debug_Generate_PartsCB(Fl_Widget * w, void * p)
 		{
 		}
 	}
-	fl_message("DEBUG: Random parts created.");
+	fl_message("%s","DEBUG: Random parts created.");
 	robot_model_dlg->update_parts();
 }
 
@@ -1827,15 +1827,15 @@ void Debug_Generate_ModelsCB(Fl_Widget * w, void * p)
 			catch (Model_Num_Exists& e)
 			{
 				fl_beep(FL_BEEP_DEFAULT);
-				fl_alert("ERROR:\nThat part number already exists!");
+				fl_alert("%s","ERROR:\nThat part number already exists!");
 			}
 		}
-		fl_message("DEBUG: Random models created.");
+		fl_message("%s","DEBUG: Random models created.");
 	}
 	catch (Missing_Parts& e)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are not enough parts registered to create a robot model.");
+		fl_alert("%s","ERROR:\nThere are not enough parts registered to create a robot model.");
 	}
 }
 
@@ -1865,7 +1865,7 @@ void Create_Robot_ModelCB(Fl_Widget * w, void * p)
 	if (robot_model_dlg->has_empty_fields())
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nNot enough information to create a robot model.");
+		fl_alert("%s","ERROR:\nNot enough information to create a robot model.");
 	}
 	else
 	{
@@ -1888,7 +1888,7 @@ void Create_Robot_ModelCB(Fl_Widget * w, void * p)
 		catch (exception& e)
 		{
 			fl_beep(FL_BEEP_DEFAULT);
-			fl_alert(e.what());
+			fl_alert("%s",e.what());
 		}
 	}
 }
@@ -1910,7 +1910,7 @@ void Select_PictureCB(Fl_Widget * w, void * p)
 	{
 	case -1:
 		fl_beep(FL_BEEP_ERROR);
-		fl_alert(pic_chooser.errmsg());
+		fl_alert("%s",pic_chooser.errmsg());
 		break;
 	case 1:
 		break;
@@ -1929,7 +1929,7 @@ void Open_List_Models_DialogCB(Fl_Widget * w, void * p)
 	else
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are no models to list.");
+		fl_alert("%s","ERROR:\nThere are no models to list.");
 	}
 }
 
@@ -1955,14 +1955,14 @@ void Debug_Generate_One_ModelCB(Fl_Widget * w, void * p)
 		catch (Model_Num_Exists& e)
 		{
 			fl_beep(FL_BEEP_DEFAULT);
-			fl_alert("ERROR:\nThat model number already exists!");
+			fl_alert("%s","ERROR:\nThat model number already exists!");
 		}
-		fl_message("DEBUG: One random model created.");
+		fl_message("%s","DEBUG: One random model created.");
 	}
 	catch (Missing_Parts& e)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are not enough parts registered to create a robot model.");
+		fl_alert("%s","ERROR:\nThere are not enough parts registered to create a robot model.");
 	}
 }
 
@@ -1982,33 +1982,33 @@ void Expand_InfoCB(Fl_Widget * w, void * p)
 		{
 			for (int i = 0; i < 2; i++)
 				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
-			fl_message(result.c_str());
+			fl_message("%s",result.c_str());
 
 			result = "";
 			result += "\nBattery 3:\n" + shop_models[index].get_batteries()[2].to_string();
 			for (int i = 0; i < shop_models[index].get_arms().size(); i++)
 				result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
-			fl_message(result.c_str());
+			fl_message("%s",result.c_str());
 		}
 		else if(shop_models[index].get_batteries().size() == 2)
 		{
 			for (int i = 0; i < shop_models[index].get_batteries().size(); i++)
 				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
-			fl_message(result.c_str());
+			fl_message("%s",result.c_str());
 
 			result = "";
 			for (int i = 0; i < shop_models[index].get_arms().size(); i++)
 				result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
-			fl_message(result.c_str());
+			fl_message("%s",result.c_str());
 		}
 		else
 		{
 			result += "\nBattery 1:\n" + shop_models[index].get_batteries()[0].to_string();
 			result += "\nArm 1:\n" + shop_models[index].get_arms()[0].to_string();
-			fl_message(result.c_str());
+			fl_message("%s",result.c_str());
 
 			result = "\nArm 2:\n" + shop_models[index].get_arms()[1].to_string();
-			fl_message(result.c_str());
+			fl_message("%s",result.c_str());
 		}
 	}
 	else
@@ -2017,7 +2017,7 @@ void Expand_InfoCB(Fl_Widget * w, void * p)
 			result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
 		for (int i = 0; i < shop_models[index].get_arms().size(); i++)
 			result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
-		fl_message(result.c_str());
+		fl_message("%s",result.c_str());
 	}
 }
 
@@ -2051,7 +2051,7 @@ void Create_CustomerCB(Fl_Widget * w, void * p)
 	if (customer_dlg->has_empty_fields())
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nNot enough information to create a customer.");
+		fl_alert("%s","ERROR:\nNot enough information to create a customer.");
 	}
 	else
 	{
@@ -2077,7 +2077,7 @@ void Create_CustomerCB(Fl_Widget * w, void * p)
 				if (found_at)
 				{
 					fl_beep(FL_BEEP_DEFAULT);
-					fl_alert("ERROR:\nThe entered email is invalid!");
+					fl_alert("%s","ERROR:\nThe entered email is invalid!");
 					found_2nd_at = true;
 				}
 				else
@@ -2098,26 +2098,26 @@ void Create_CustomerCB(Fl_Widget * w, void * p)
 
 		if (found_at && !found_2nd_at)
 		{
-			int correct = fl_ask(("Is this correct?\n" + result).c_str());
+			int correct = fl_ask("%s",("Is this correct?\n" + result).c_str());
 			if (correct == 1) //Yes
 			{
 				try
 				{
 					shop->add(*new_customer);
-					fl_message((name + " was successfully added.").c_str());
+					fl_message("%s",(name + " was successfully added.").c_str());
 					customer_dlg->hide();
 				}
 				catch (Customer_Exists& e)
 				{
 					fl_beep(FL_BEEP_DEFAULT);
-					fl_alert("ERROR:\nThat customer already exists!");
+					fl_alert("%s","ERROR:\nThat customer already exists!");
 				}
 			}
 		}
 		else if (!found_at)
 		{
 			fl_beep(FL_BEEP_DEFAULT);
-			fl_alert("ERROR:\nThe entered email is invalid!");
+			fl_alert("%s","ERROR:\nThe entered email is invalid!");
 		}
 
 	}
@@ -2138,7 +2138,7 @@ void Create_Sales_AssociateCB(Fl_Widget * w, void * p)
 	if (sales_assoc_dlg->has_empty_fields())
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nNot enough information to create a sales associate.");
+		fl_alert("%s","ERROR:\nNot enough information to create a sales associate.");
 	}
 	else
 	{
@@ -2146,19 +2146,19 @@ void Create_Sales_AssociateCB(Fl_Widget * w, void * p)
 		int employee_num = sales_assoc_dlg->get_employee_num();
 
 		Sales_Associate* new_associate = new Sales_Associate(name, employee_num);
-		int correct = fl_ask(("Is this correct?\n" + new_associate->to_string()).c_str());
+		int correct = fl_ask("%s",("Is this correct?\n" + new_associate->to_string()).c_str());
 		if (correct == 1) //Yes
 		{
 			try
 			{
 				shop->add(*new_associate);
-				fl_message((name + " was successfully added.").c_str());
+				fl_message("%s",(name + " was successfully added.").c_str());
 				sales_assoc_dlg->hide();
 			}
 			catch (Sales_Associate_Exists& e)
 			{
 				fl_beep(FL_BEEP_DEFAULT);
-				fl_alert("ERROR:\nThat employee number already exists!");
+				fl_alert("%s","ERROR:\nThat employee number already exists!");
 			}
 		}
 	}
@@ -2169,17 +2169,17 @@ void Open_Robot_Order_DialogCB(Fl_Widget * w, void * p)
 	if (shop->get_models().size() == 0)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are no robot models to order.");
+		fl_alert("%s","ERROR:\nThere are no robot models to order.");
 	}
 	else if (shop->get_sales_associates().size() == 0)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are no sales associates registered to place an order.");
+		fl_alert("%s","ERROR:\nThere are no sales associates registered to place an order.");
 	}
 	else if (shop->get_customers().size() == 0)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThere are no customers registered to place an order.");
+		fl_alert("%s","ERROR:\nThere are no customers registered to place an order.");
 	}
 	else
 		robot_order_dlg->show();
@@ -2195,7 +2195,7 @@ void Create_Robot_OrderCB(Fl_Widget * w, void * p)
 	if (robot_order_dlg->has_empty_fields())
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nNot enough information to create a robot order.");
+		fl_alert("%s","ERROR:\nNot enough information to create a robot order.");
 	}
 	else
 	{
@@ -2205,11 +2205,11 @@ void Create_Robot_OrderCB(Fl_Widget * w, void * p)
 		Customer customer = robot_order_dlg->get_customer();
 
 		Robot_Order* order = new Robot_Order(model, quantity, associate, customer);
-		int correct = fl_ask(("Is this correct?\n" + order->to_string()).c_str());
+		int correct = fl_ask("%s",("Is this correct?\n" + order->to_string()).c_str());
 		if (correct == 1) //Yes
 		{
 			shop->add(*order);
-			fl_message((customer.get_name() + "'s order was successfully placed.").c_str());
+			fl_message("%s",(customer.get_name() + "'s order was successfully placed.").c_str());
 			robot_order_dlg->hide();
 		}
 	}
@@ -2242,7 +2242,7 @@ void Debug_Generate_CustomersCB(Fl_Widget * w, void * p)
 		{
 		}
 	}
-	fl_message("DEBUG: Random customers created.");
+	fl_message("%s","DEBUG: Random customers created.");
 }
 
 void Debug_Generate_Sales_AssociatesCB(Fl_Widget * w, void * p)
@@ -2257,7 +2257,7 @@ void Debug_Generate_Sales_AssociatesCB(Fl_Widget * w, void * p)
 		{
 		}
 	}
-	fl_message("DEBUG: Random sales associates created.");
+	fl_message("%s","DEBUG: Random sales associates created.");
 }
 
 void Is_Correct_ModelCB(Fl_Widget * w, void * p)
@@ -2266,13 +2266,13 @@ void Is_Correct_ModelCB(Fl_Widget * w, void * p)
 	try
 	{
 		shop->add(model_correct_dlg->get_model());
-		fl_message((model_correct_dlg->get_model().get_name() + " was successfully added.").c_str());
+		fl_message("%s",(model_correct_dlg->get_model().get_name() + " was successfully added.").c_str());
 		robot_model_dlg->hide();
 	}
 	catch (Model_Num_Exists& e)
 	{
 		fl_beep(FL_BEEP_DEFAULT);
-		fl_alert("ERROR:\nThat model number already exists!");
+		fl_alert("%s","ERROR:\nThat model number already exists!");
 	}
 }
 
