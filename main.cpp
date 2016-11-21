@@ -172,7 +172,7 @@ public:
 		speed_in->hide();
 
 		//Battery's extra field
-		energy_in = new Fl_Float_Input(x + 40, y, w - 40, h, "Energy contained: [kWh]");
+		energy_in = new Fl_Float_Input(x + 60, y, w - 60, h, "Energy contained: [kWh]");
 		energy_in->align(FL_ALIGN_LEFT);
 		energy_in->hide();
 
@@ -1010,13 +1010,13 @@ class Customer_Dialog
 public:
 	Customer_Dialog()
 	{
-		int x = 120;
+		int x = 140;
 		int y = 10;
 		int w = 210;
 		int h = 25;
 		int y_incr = 30;
 
-		dialog = new Fl_Window(340, 330, "Add a New Customer");
+		dialog = new Fl_Window(360, 330, "Add a New Customer");
 
 		name_in = new Fl_Input(x, y, w, h, "Name:"); y += y_incr;
 		name_in->align(FL_ALIGN_LEFT);
@@ -1031,11 +1031,11 @@ public:
 
 		apt_po_choices = new Fl_Group(0, y, dialog->w(), h, "Is this address a PO box or an apartment address?");
 		apt_po_choices->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-		is_apt = new Fl_Radio_Round_Button(40, y, 90, h, "Apartment");
+		is_apt = new Fl_Radio_Round_Button(40, y, 100, h, "Apartment");
 		is_apt->callback(Apartment_AddressCB);
-		is_po = new Fl_Radio_Round_Button(150, y, 70, h, "PO Box");
+		is_po = new Fl_Radio_Round_Button(150, y, 75, h, "PO Box");
 		is_po->callback(PO_Box_AddressCB);
-		neither = new Fl_Radio_Round_Button(250, y, 70, h, "Neither");
+		neither = new Fl_Radio_Round_Button(250, y, 75, h, "Neither");
 		neither->callback(Regular_AddressCB);
 		apt_po_choices->end();
 		
@@ -1060,10 +1060,10 @@ public:
 		zip_in = new Fl_Input(x, y, w, h, "ZIP Code:"); y += y_incr;
 		zip_in->align(FL_ALIGN_LEFT);
 
-		create = new Fl_Return_Button(120, y, 100, h, "Add");
+		create = new Fl_Return_Button(140, y, 100, h, "Add");
 		create->callback(Create_CustomerCB);
 
-		cancel = new Fl_Button(230, y, 100, h, "Cancel");
+		cancel = new Fl_Button(250, y, 100, h, "Cancel");
 		cancel->callback(Cancel_CustomerCB);
 		//dialog->resizable(dialog);
 		dialog->end();
@@ -1234,9 +1234,9 @@ class Sales_Associate_Dialog
 public:
 	Sales_Associate_Dialog()
 	{
-		int x = 130;
+		int x = 145;
 		int y = 10;
-		int w = 210;
+		int w = 195;
 		int h = 25;
 		int y_incr = 30;
 
@@ -1248,10 +1248,10 @@ public:
 		emp_num_in = new Fl_Int_Input(x, y, w, h, "Employee Number:"); y += y_incr;
 		emp_num_in->align(FL_ALIGN_LEFT);
 
-		create = new Fl_Return_Button(x + 20, y, 100, h, "Add");
+		create = new Fl_Return_Button(x + 10, y, 100, h, "Add");
 		create->callback(Create_Sales_AssociateCB);
 
-		cancel = new Fl_Button(x + 135, y, 75, h, "Cancel");
+		cancel = new Fl_Button(x + 120, y, 75, h, "Cancel");
 		cancel->callback(Cancel_Sales_AssociateCB);
 
 		dialog->end();
