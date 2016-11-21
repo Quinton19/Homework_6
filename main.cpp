@@ -1433,11 +1433,11 @@ class Robot_Model_Correct_Dialog
 public:
 	Robot_Model_Correct_Dialog(Robot_Model* rm)
 	{
-		dialog = new Fl_Window(340, 500);
+		dialog = new Fl_Window(340, 460);
 
 		model = rm;
 
-		image_box = new Fl_Box(20, 20, 100, 20);
+		image_box = new Fl_Box(10, -10, 100, 20);
 		image_box->copy_label(("\nIs this correct?\n" + rm->to_string()).c_str());
 		image_box->align(FL_ALIGN_BOTTOM_LEFT);
 
@@ -1459,10 +1459,10 @@ public:
 			throw runtime_error("ERROR:\nFile format not supported.");
 		}
 
-		yes = new Fl_Return_Button(120, 400, 70, 25, "Yes");
+		yes = new Fl_Return_Button(180, 430, 70, 25, "Yes");
 		yes->callback(Is_Correct_ModelCB);
 
-		no = new Fl_Button(200, 400, 70, 25, "No");
+		no = new Fl_Button(260, 430, 70, 25, "No");
 		no->callback(Is_Not_Correct_ModelCB);
 
 		dialog->end();
@@ -1495,7 +1495,7 @@ private:
 int main()
 {
 	const int X = 500;
-	const int Y = 500;
+	const int Y = 325;
 
 	robot_part_dlg = new Robot_Part_Dialog();
 	robot_model_dlg = new Robot_Model_Dialog();
@@ -1506,6 +1506,13 @@ int main()
 	window = new Fl_Window(X, Y);
 
 	fl_register_images();
+
+	Fl_Box* welcome = new Fl_Box(50, 50, 400, 250, "Welcome to the\nRobbie Robot\nShop Manager");
+	welcome->box(FL_UP_BOX);
+	welcome->labelfont(FL_HELVETICA);
+	//welcome->labelfont(FL_BOLD);
+	welcome->labelsize(55);
+	welcome->labeltype(FL_SHADOW_LABEL);
 	
 	Fl_Menu_Bar *menubar = new Fl_Menu_Bar(0, 0, X, 30);
 
@@ -1571,7 +1578,7 @@ int main()
 	}
 	*/
     
-	window->resizable(window);
+	//window->resizable(window);
 
 	window->end();
 	window->show();
