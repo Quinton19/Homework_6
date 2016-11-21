@@ -447,7 +447,7 @@ public:
 		price_in = new Fl_Float_Input(x, y, w, h, "Price:"); y += y_incr;
 		price_in->align(FL_ALIGN_LEFT);
 
-		select_pic = new Fl_Button(x + 40, y, 170, h, "Select a Picture @menu"); y += y_incr;
+		select_pic = new Fl_Button(x + 30, y, 180, h, "Select a Picture @menu"); y += y_incr;
 		select_pic->callback(Select_PictureCB);
 
 		create = new Fl_Return_Button(145, y, 120, 25, "Add");
@@ -1507,10 +1507,10 @@ int main()
 
 	fl_register_images();
 
-	Fl_Box* welcome = new Fl_Box(50, 50, 400, 250, "Welcome to the\nRobbie Robot\nShop Manager");
+	Fl_Box* welcome = new Fl_Box(25, 50, 450, 250, "Welcome to the\nRobbie Robot\nShop Manager");
+    welcome->align(FL_ALIGN_CENTER);
 	welcome->box(FL_UP_BOX);
 	welcome->labelfont(FL_HELVETICA);
-	//welcome->labelfont(FL_BOLD);
 	welcome->labelsize(55);
 	welcome->labeltype(FL_SHADOW_LABEL);
 	
@@ -1518,7 +1518,7 @@ int main()
 
 	Fl_Menu_Item menuitems[] = {
 		{"&File", 0, 0, 0, FL_SUBMENU },
-			{"&Quit", 0, (Fl_Callback*)CloseCB },
+			{"&Quit", FL_ALT + 'q', (Fl_Callback*)CloseCB },
 			{ 0 },
 		{"&New", 0, 0, 0, FL_SUBMENU },
 			{"Robot &Part", 0, (Fl_Callback*)Open_Robot_Part_DialogCB },

@@ -1,4 +1,5 @@
 #include "Shop.h"
+#include <string>
 
 int main()
 {
@@ -225,7 +226,7 @@ int main()
 	Robot_Model *r;
 	try
 	{
-		r = new Robot_Model("Test Robot Model 1", 1, 1000000, h, t2, l, &arms, batteries);
+		r = new Robot_Model("Test Robot Model 1", 1, 1000000, h, t2, l, &arms, batteries, "");
 	}
 	catch (Arm_Limit& limit_a)
 	{
@@ -242,7 +243,7 @@ int main()
 	vector<Battery> bad_batteries;
 	try
 	{
-		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &bad_arms, batteries);
+		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &bad_arms, batteries, "");
 		pass = false;
 		fail_messages += "failed to catch Arm_Limit exception when there was no arms\n";
 	}
@@ -254,7 +255,7 @@ int main()
 	bad_arms.push_back(a);
 	try
 	{
-		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &bad_arms, batteries);
+		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &bad_arms, batteries, "");
 		pass = false;
 		fail_messages += "failed to catch Arm_Limit exception when there was too many arms\n";
 	}
@@ -263,7 +264,7 @@ int main()
 
 	try
 	{
-		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &arms, bad_batteries);
+		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &arms, bad_batteries, "");
 		pass = false;
 		fail_messages += "failed to catch Batteries_Limit exception when there was no batteries\n";
 	}
@@ -276,7 +277,7 @@ int main()
 	bad_batteries.push_back(b);
 	try
 	{
-		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &arms, bad_batteries);
+		Robot_Model r("Test Robot Model 2", 2, 0, h, t2, l, &arms, bad_batteries, "");
 		pass = false;
 		fail_messages += "failed to catch Batteries_Limit exception when there was too many batteries\n";
 	}
@@ -580,13 +581,99 @@ int main()
         pass = false;
         fail_messages += ".get_email_address() failed in class Customer\n";
     }
-    if(test_customer.get_address().get().to_string().compare(test_address3.to_string()) != 0)
+    if(test_customer.get_address_ref().get().to_string().compare(test_address3.to_string()) != 0)
     {
         pass = false;
         fail_messages += ".get_address() failed in class Customer\n";
     }
-
-	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    if(test_customer.to_string().compare("Name: John Smith\n"
+                                        + (string)"Phone Number: (000)000-0000\n"
+                                        + "Email: not_real@bmail.com\n"
+                                        + "Address:\n" + test_customer.get_address_ref().get().to_string() + "\n") != 0)
+    {
+        pass = false;
+        fail_messages += ".to_string() failed in class Customer\n";
+    }
+    if(!(test_customer == test_customer))
+    {
+        pass = false;
+        fail_messages += "the operator == failed in class Customer\n";
+    }
+    if(test_customer != test_customer)
+    {
+        pass = false;
+        fail_messages += "the operator != failed in class Customer\n";
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Testing Sales_Associate
+    Sales_Associate test_associate("Johnathan Smithy", 123456);
+    if(test_associate.get_name().compare("Johnathan Smithy") != 0)
+    {
+        pass = false;
+        fail_messages += ".get_name() failed in class Sales_Associate\n";
+    }
+    if(test_associate.get_employee_num() != 123456)
+    {
+        pass = false;
+        fail_messages += ".get_employee_num() failed in class Sales_Associate\n";
+    }
+    if(test_associate.to_string().compare("Name: Johnathan Smithy\nEmployee #123456\n") != 0)
+    {
+        pass = false;
+        fail_messages += ".to_string() failed in class Sales_Associate\n";
+    }
+    if(!(test_associate == test_associate))
+    {
+        pass = false;
+        fail_messages += "the operator == failed in class Sales_Associate\n";
+    }
+    if(test_associate != test_associate)
+    {
+        pass = false;
+        fail_messages += "the operator != failed in class Sales_Associate\n";
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Testing Robot_Order
+    Robot_Order test_order(*r, 10, test_associate, test_customer);
+    if(test_order.get_model().to_string().compare(r->to_string()) != 0)
+    {
+        pass = false;
+        fail_messages += ".get_model() failed in class Robot_Order\n";
+    }
+    if(test_order.get_quantity() != 10)
+    {
+        pass = false;
+        fail_messages += ".get_quantity() failed in class Robot_Order\n";
+    }
+    if(test_order.get_total_cost() != (r->get_price() * 10))
+    {
+        pass = false;
+        fail_messages += ".get_total_cost() failed in class Robot_Order\n";
+    }
+    if(test_order.get_orderer() != test_associate)
+    {
+        pass = false;
+        fail_messages += ".get_orderer() failed in class Robot_Order\n";
+    }
+    if(test_order.get_customer() != test_customer)
+    {
+        pass = false;
+        fail_messages += ".get_customer() failed in class Robot_Order\n";
+    }
+    if(test_order.to_string().compare("Date: " + test_order.get_order_time() + "\n"
+                                    + "Robot Model Ordered: " + r->get_name() + " -- #" + Str_conversion::to_string(r->get_model_num()) + "\n"
+                                    + "Amount ordered: 10\n"
+                                    + "Total amount due: $" + Str_conversion::to_string(r->get_price() * 10) + "\n"
+                                    + "Sales Associate ID: 123456\n"
+                                    + "Customer Name: John Smith\n") != 0)
+    {
+        pass = false;
+        fail_messages += ".to_string() failed in class Robot_Order\n";
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//end of tests
 	if (!pass)
 	{
