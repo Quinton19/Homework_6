@@ -240,7 +240,7 @@ void Shop::create_rand_model() //for testing purposes only
 	}
 
 	num_rand_models++;
-	Robot_Model model("Random Robot Model " + Str_conversion::to_string(num_rand_models), (rand() % 10000000), ((rand() % 1000000) / 100.0), head, torso, locomotor, &arms, batteries);
+	Robot_Model model("Random Robot Model " + Str_conversion::to_string(num_rand_models), (rand() % 10000000), ((rand() % 1000000) / 100.0), head, torso, locomotor, &arms, batteries, "DEBUG_PIC.png");
 	try
 	{
 		add(model);

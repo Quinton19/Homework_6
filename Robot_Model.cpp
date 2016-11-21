@@ -1,6 +1,6 @@
 #include "Robot_Model.h"
 
-Robot_Model::Robot_Model(string n, int mn, double p, Head h, Torso t, Locomotor l, vector<Arm>* a, vector<Battery> b)
+Robot_Model::Robot_Model(string n, int mn, double p, Head h, Torso t, Locomotor l, vector<Arm>* a, vector<Battery> b, string pic)
 {
 	name = n;
 	model_num = mn;
@@ -24,6 +24,7 @@ Robot_Model::Robot_Model(string n, int mn, double p, Head h, Torso t, Locomotor 
 	{
 		batteries = b;
 	}
+	pic_filename = pic;
 }
 
 string Robot_Model::get_name()
@@ -64,6 +65,11 @@ vector<Arm> Robot_Model::get_arms()
 vector<Battery> Robot_Model::get_batteries()
 {
 	return batteries;
+}
+
+string Robot_Model::get_pic_filename()
+{
+	return pic_filename;
 }
 
 void Robot_Model::set_price(double p)

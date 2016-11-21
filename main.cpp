@@ -18,9 +18,12 @@
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Shared_Image.H>
 #include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_JPEG_Image.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include "Shop.h"
 
 using namespace std;
@@ -49,6 +52,7 @@ void No_Another_ArmCB(Fl_Widget* w, void* p);
 
 void Create_Robot_ModelCB(Fl_Widget* w, void* p);
 void Cancel_Robot_ModelCB(Fl_Widget* w, void* p);
+void Select_PictureCB(Fl_Widget* w, void* p);
 
 void Open_List_Models_DialogCB(Fl_Widget* w, void* p);
 void Next_PageCB(Fl_Widget* w, void* p);
@@ -79,12 +83,16 @@ void Selected_CustomerCB(Fl_Widget* w, void* p);
 void Debug_Generate_CustomersCB(Fl_Widget* w, void* p);
 void Debug_Generate_Sales_AssociatesCB(Fl_Widget* w, void* p);
 
+void Is_Correct_ModelCB(Fl_Widget* w, void* p);
+void Is_Not_Correct_ModelCB(Fl_Widget* w, void* p);
+
 class Robot_Part_Dialog;
 class Robot_Model_Dialog;
 class List_Models_Dialog;
 class Customer_Dialog;
 class Sales_Associate_Dialog;
 class Robot_Order_Dialog;
+class Robot_Model_Correct_Dialog;
 
 Fl_Window* window;
 Shop* shop;
@@ -94,6 +102,7 @@ List_Models_Dialog* list_models_dlg;
 Customer_Dialog* customer_dlg;
 Sales_Associate_Dialog* sales_assoc_dlg;
 Robot_Order_Dialog* robot_order_dlg;
+Robot_Model_Correct_Dialog* model_correct_dlg;
 
 //===============================================================================================================================================================
 class Robot_Part_Dialog
@@ -136,14 +145,14 @@ public:
 		description_in = new Fl_Multiline_Input(x, y, w, 75, "Description:"); y += 80;
 		description_in->align(FL_ALIGN_LEFT);
 
-		create = new Fl_Return_Button(145, 240, 120, 25, "Create");
+		create = new Fl_Return_Button(145, 240, 120, 25, "Add");
 		create->callback((Fl_Callback *)Create_Robot_PartCB, 0);
 
 		cancel = new Fl_Button(270, 240, 60, 25, "Cancel");
 		cancel->callback((Fl_Callback *)Cancel_Robot_PartCB, 0);
 
 		//Torso's extra field
-		batt_compartments_in = new Fl_Choice(x, y, w, h, "Number of Battery Compartments:"); 
+		batt_compartments_in = new Fl_Choice(270, y, 50, h, "Number of Battery Compartments:"); 
 		batt_compartments_in->align(FL_ALIGN_LEFT);
 
         batt_compartments_in->callback(Selected_CompartmentsCB, NULL);
@@ -153,7 +162,7 @@ public:
 		batt_compartments_in->hide();
 
 		//Locomotor's and Arm's extra field
-		pwr_consumed_in = new Fl_Float_Input(x, y, w, h, "Power consumed: [W]");
+		pwr_consumed_in = new Fl_Float_Input(x + 40, y, w - 40, h, "Power consumed: [W]");
 		pwr_consumed_in->align(FL_ALIGN_LEFT);
 		pwr_consumed_in->hide();
         
@@ -163,7 +172,7 @@ public:
 		speed_in->hide();
 
 		//Battery's extra field
-		energy_in = new Fl_Float_Input(x, y, w, h, "Energy contained: [kWh]");
+		energy_in = new Fl_Float_Input(x + 40, y, w - 40, h, "Energy contained: [kWh]");
 		energy_in->align(FL_ALIGN_LEFT);
 		energy_in->hide();
 
@@ -351,7 +360,7 @@ public:
 		int h = 25;
 		int y_incr = 30;
         
-        dialog = new Fl_Window(340, 400, "Add a Robot Model");
+        dialog = new Fl_Window(340, 430, "Add a Robot Model");
         
         name_in = new Fl_Input(x, y, w, h, "Name:"); y += y_incr;
         name_in->align(FL_ALIGN_LEFT);
@@ -438,7 +447,10 @@ public:
 		price_in = new Fl_Float_Input(x, y, w, h, "Price:"); y += y_incr;
 		price_in->align(FL_ALIGN_LEFT);
 
-		create = new Fl_Return_Button(145, y, 120, 25, "Create");
+		select_pic = new Fl_Button(x + 40, y, 170, h, "Select a Picture @menu"); y += y_incr;
+		select_pic->callback(Select_PictureCB);
+
+		create = new Fl_Return_Button(145, y, 120, 25, "Add");
 		create->callback((Fl_Callback *)Create_Robot_ModelCB, 0);
 
 		cancel = new Fl_Button(270, y, 60, 25, "Cancel");
@@ -449,6 +461,8 @@ public:
     }
     void show()
     {
+		chose_pic = false;
+		select_pic->label("Select a Picture @menu");
         dialog->show();
     }
 	void hide()
@@ -548,6 +562,7 @@ public:
 		radio_groups[2]->position(radio_groups[2]->x(), radio_groups[2]->y() + y_incr);
 		part_cost_display->position(part_cost_display->x(), part_cost_display->y() + y_incr);
 		price_in->resize(price_in->x(), price_in->y() + y_incr, price_in->w(), price_in->h());
+		select_pic->resize(select_pic->x(), select_pic->y() + y_incr, select_pic->w(), select_pic->h());
 		update_cost();
 	}
 	void hide_extra_battery(int position)
@@ -569,6 +584,7 @@ public:
 				radio_groups[2]->position(radio_groups[2]->x(), radio_groups[2]->y() - y_decr);
 				part_cost_display->position(part_cost_display->x(), part_cost_display->y() - y_decr);
 				price_in->resize(price_in->x(), price_in->y() - y_decr, price_in->w(), price_in->h());
+				select_pic->resize(select_pic->x(), select_pic->y() - y_decr, select_pic->w(), select_pic->h());
 
 				battery_choices[1]->hide();
 				radio_groups[1]->hide();
@@ -586,6 +602,7 @@ public:
 				radio_groups[2]->position(radio_groups[2]->x(), radio_groups[2]->y() - y_decr);
 				part_cost_display->position(part_cost_display->x(), part_cost_display->y() - y_decr);
 				price_in->resize(price_in->x(), price_in->y() - y_decr, price_in->w(), price_in->h());
+				select_pic->resize(select_pic->x(), select_pic->y() - y_decr, select_pic->w(), select_pic->h());
 
 				yes_options[1]->value(0);
 
@@ -605,6 +622,7 @@ public:
 		cancel->position(cancel->x(), cancel->y() + y_incr);
 		part_cost_display->position(part_cost_display->x(), part_cost_display->y() + y_incr);
 		price_in->resize(price_in->x(), price_in->y() + y_incr, price_in->w(), price_in->h());
+		select_pic->resize(select_pic->x(), select_pic->y() + y_incr, select_pic->w(), select_pic->h());
 
 		arm_choices[1]->show();
 		update_cost();
@@ -620,6 +638,7 @@ public:
 			cancel->position(cancel->x(), cancel->y() - y_decr);
 			part_cost_display->position(part_cost_display->x(), part_cost_display->y() - y_decr);
 			price_in->resize(price_in->x(), price_in->y() - y_decr, price_in->w(), price_in->h());
+			select_pic->resize(select_pic->x(), select_pic->y() - y_decr, select_pic->w(), select_pic->h());
 
 			arm_choices[1]->hide();
 			update_cost();
@@ -671,6 +690,12 @@ public:
 	{
 		chose_arm[index] = true;
 	}
+	void pic_chosen(string filename)
+	{
+		pic_filename = filename;
+		select_pic->label("Select Another Picture @menu");
+		chose_pic = true;
+	}
 
 	string get_name()
 	{
@@ -718,6 +743,10 @@ public:
 	{
 		return atof(price_in->value());
 	}
+	string get_pic_filename()
+	{
+		return pic_filename;
+	}
 
 	bool has_empty_fields()
 	{
@@ -745,6 +774,8 @@ public:
 			is_empty = true;
 		else if (strcmp(price_in->value(), "") == 0)
 			is_empty = true;
+		else if (!chose_pic)
+			is_empty = true;
 
 		return is_empty;
 	}
@@ -762,11 +793,13 @@ private:
     vector<Fl_Group*> radio_groups;
     Fl_Box* part_cost_display;
     Fl_Float_Input* price_in;
-    
+	Fl_Button* select_pic;
+
     Fl_Return_Button* create;
     Fl_Button* cancel;
     
 	string part_cost_display_label = "Total cost of components: $0.00";
+	string pic_filename;
 
     double total_cost;
     bool chose_head = false;
@@ -774,6 +807,7 @@ private:
     bool chose_locomotor = false;
     vector<bool> chose_arm = { false, false };
     vector<bool> chose_battery = { false, false, false };
+	bool chose_pic = false;
 
 	vector<Head> shop_heads;
 	vector<Torso> shop_torsos;
@@ -791,7 +825,7 @@ public:
 		int y = 35;
 		int y_incr = 185;
 
-		dialog = new Fl_Window(500, 900, "List of Current Robot Models");
+		dialog = new Fl_Window(600, 690, "List of Current Robot Models");
 
 		page_number = new Fl_Counter((dialog->w() / 2) - 75, y, 150, 25, "Page Number");
 		page_number->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
@@ -802,7 +836,7 @@ public:
 		page_number->callback(Next_PageCB);
 		page_number->when(FL_WHEN_CHANGED);
 
-		done = new Fl_Return_Button(390, y, 100, 25, "Done");
+		done = new Fl_Return_Button(470, y, 100, 25, "Done");
 		done->callback(DoneCB);
 
 		dialog->end();
@@ -830,11 +864,18 @@ public:
 			expand_info[i]->hide();
 			if (dialog->contains(expand_info[i]) == 1)
 				dialog->remove(expand_info[i]);
+
+			image_boxes[i]->hide();
+			if (dialog->contains(image_boxes[i]) == 1)
+				dialog->remove(image_boxes[i]);
 		}
 
 		shop_models = shop->get_models();
 		model_displays.clear();
 		expand_info.clear();
+		image_boxes.clear();
+		jpg_images.clear();
+		png_images.clear();
 		for (int i = 0; i < shop_models.size(); i++)
 		{
 			model_displays.push_back(new Fl_Multiline_Output(x, 0, w, h));
@@ -851,18 +892,41 @@ public:
 			expand_info.push_back(new Fl_Button(265, 0, 125, 25, "Additional Info @+"));
 			expand_info[i]->hide();
 			expand_info[i]->callback(Expand_InfoCB, (void*)i);
+
+			image_boxes.push_back(new Fl_Box(400, 0, 150, 150));
+			image_boxes[i]->hide();
+
+			if (shop_models[i].get_pic_filename().find(".jpg") != string::npos)
+			{
+				jpg_images.push_back(new Fl_JPEG_Image(shop_models[i].get_pic_filename().c_str()));
+				jpg_images[i] = (Fl_JPEG_Image*)jpg_images[i]->copy(150, 150);
+				png_images.push_back(NULL);
+				image_boxes[i]->image(*jpg_images[i]);
+			}
+			else if(shop_models[i].get_pic_filename().find(".png") != string::npos)
+			{
+				png_images.push_back(new Fl_PNG_Image(shop_models[i].get_pic_filename().c_str()));
+				png_images[i] = (Fl_PNG_Image*)png_images[i]->copy(150, 150);
+				jpg_images.push_back(NULL);
+				image_boxes[i]->image(*png_images[i]);
+			}
+			else
+			{
+				jpg_images.push_back(NULL);
+				png_images.push_back(NULL);
+			}
 		}
-		if (model_displays.size() % 4 == 0)
-			page_number->bounds(1, (model_displays.size() / 4));
+		if (model_displays.size() % 3 == 0)
+			page_number->bounds(1, (model_displays.size() / 3));
 		else
-			page_number->bounds(1, (model_displays.size() / 4) + 1);
+			page_number->bounds(1, (model_displays.size() / 3) + 1);
 	}
 	void construct_list(int page)
 	{
 		int y = 15;
 		int y_incr = 180;
-		int max = page * 4;
-		int min = (page - 1) * 4;
+		int max = page * 3;
+		int min = (page - 1) * 3;
 
 		for (int i = 0; i < model_displays.size(); i++)
 		{
@@ -873,15 +937,24 @@ public:
 			expand_info[i]->hide();
 			if (dialog->contains(expand_info[i]) == 1)
 				dialog->remove(expand_info[i]);
+
+			image_boxes[i]->hide();
+			if (dialog->contains(image_boxes[i]) == 1)
+				dialog->remove(image_boxes[i]);
 		}
 
 		int i;
 		for (i = min; i < max && i < model_displays.size(); i++)
 		{			
-			model_displays[i]->resize(x, y, w, h);
-			y += y_incr;			
+			model_displays[i]->resize(x, y, w, h);			
 			model_displays[i]->show();
 			dialog->add(model_displays[i]);
+
+			image_boxes[i]->resize(image_boxes[i]->x(), y + 10, image_boxes[i]->w(), image_boxes[i]->h());
+			image_boxes[i]->show();
+			dialog->add(image_boxes[i]);
+
+			y += y_incr;
 
 			expand_info[i]->resize(expand_info[i]->x(), y, expand_info[i]->w(), expand_info[i]->h());
 			y += 30;
@@ -896,20 +969,20 @@ public:
 		{
 			int num_missing = max - model_displays.size();
 
-			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 900 - (num_missing * (y_incr + 30)));
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 690 - (num_missing * (y_incr + 30)));
 
 			string new_title;
 
-			if (num_missing == 3)
+			if (num_missing == 2)
 				new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1);
 			else
-				new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(min + (4 - num_missing));
+				new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(min + (3 - num_missing));
 
 			dialog->copy_label(new_title.c_str());
 		}
 		else
 		{
-			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 900);
+			dialog->resize(dialog->x(), dialog->y(), dialog->w(), 690);
 			string new_title = "List of Current Robot Models: " + Str_conversion::to_string(min + 1) + " - " + Str_conversion::to_string(max);
 			dialog->copy_label(new_title.c_str());
 		}
@@ -922,6 +995,9 @@ private:
 	vector<Fl_Multiline_Output*> model_displays;
 	vector<Fl_Button*> expand_info;
 	vector<Robot_Model> shop_models;
+	vector<Fl_Box*> image_boxes;
+	vector<Fl_JPEG_Image*> jpg_images;
+	vector<Fl_PNG_Image*> png_images;
 
 	const int x = 90;
 	const int w = 300;
@@ -955,11 +1031,11 @@ public:
 
 		apt_po_choices = new Fl_Group(0, y, dialog->w(), h, "Is this address a PO box or an apartment address?");
 		apt_po_choices->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-		is_apt = new Fl_Radio_Round_Button(40, y, 40, h, "Apartment");
+		is_apt = new Fl_Radio_Round_Button(40, y, 90, h, "Apartment");
 		is_apt->callback(Apartment_AddressCB);
-		is_po = new Fl_Radio_Round_Button(150, y, 40, h, "PO Box");
+		is_po = new Fl_Radio_Round_Button(150, y, 70, h, "PO Box");
 		is_po->callback(PO_Box_AddressCB);
-		neither = new Fl_Radio_Round_Button(250, y, 40, h, "Neither");
+		neither = new Fl_Radio_Round_Button(250, y, 70, h, "Neither");
 		neither->callback(Regular_AddressCB);
 		apt_po_choices->end();
 		
@@ -1247,7 +1323,7 @@ public:
 		customer_choice->align(FL_ALIGN_LEFT);
 		customer_choice->callback(Selected_CustomerCB);
 
-		create = new Fl_Return_Button(x, y, 125, h, "Place Order");
+		create = new Fl_Return_Button(x + 20, y, 125, h, "Place Order");
 		create->callback(Create_Robot_OrderCB);
 
 		cancel = new Fl_Button(x + 150, y, 60, h, "Cancel");
@@ -1352,6 +1428,70 @@ private:
 };
 //===============================================================================================================================================================
 
+class Robot_Model_Correct_Dialog
+{
+public:
+	Robot_Model_Correct_Dialog(Robot_Model* rm)
+	{
+		dialog = new Fl_Window(340, 500);
+
+		model = rm;
+
+		image_box = new Fl_Box(20, 20, 100, 20);
+		image_box->copy_label(("\nIs this correct?\n" + rm->to_string()).c_str());
+		image_box->align(FL_ALIGN_BOTTOM_LEFT);
+
+		string pic_filename = rm->get_pic_filename();
+		if (pic_filename.find(".jpg") != string::npos)
+		{
+			jpg = new Fl_JPEG_Image(pic_filename.c_str());
+			jpg = (Fl_JPEG_Image*)jpg->copy(200, 200);
+			image_box->image(*jpg);
+		}
+		else if (pic_filename.find(".png") != string::npos)
+		{
+			png = new Fl_PNG_Image(pic_filename.c_str());
+			png = (Fl_PNG_Image*)png->copy(200, 200);
+			image_box->image(*png);
+		}
+		else
+		{
+			throw runtime_error("ERROR:\nFile format not supported.");
+		}
+
+		yes = new Fl_Return_Button(120, 400, 70, 25, "Yes");
+		yes->callback(Is_Correct_ModelCB);
+
+		no = new Fl_Button(200, 400, 70, 25, "No");
+		no->callback(Is_Not_Correct_ModelCB);
+
+		dialog->end();
+		dialog->set_non_modal();
+	}
+	void show()
+	{
+		dialog->show();
+	}
+	void hide()
+	{
+		dialog->hide();
+	}
+	Robot_Model get_model()
+	{
+		return *model;
+	}
+private:
+	Fl_Window* dialog;
+	Robot_Model* model;
+	Fl_Box* image_box;
+	Fl_JPEG_Image* jpg;
+	Fl_JPEG_Image* jpg2;
+	Fl_PNG_Image* png;
+	Fl_Return_Button* yes;
+	Fl_Button* no;
+};
+//===============================================================================================================================================================
+
 int main()
 {
 	const int X = 500;
@@ -1364,6 +1504,8 @@ int main()
 	sales_assoc_dlg = new Sales_Associate_Dialog();
 	robot_order_dlg = new Robot_Order_Dialog();
 	window = new Fl_Window(X, Y);
+
+	fl_register_images();
 	
 	Fl_Menu_Bar *menubar = new Fl_Menu_Bar(0, 0, X, 30);
 
@@ -1728,22 +1870,18 @@ void Create_Robot_ModelCB(Fl_Widget * w, void * p)
 		vector<Battery> batteries = robot_model_dlg->get_batteries();
 		vector<Arm> arms = robot_model_dlg->get_arms();
 		double price = robot_model_dlg->get_price();
+		string pic_filename = robot_model_dlg->get_pic_filename();
 
-		Robot_Model* new_model = new Robot_Model(name, model_num, price, head, torso, locomotor, &arms, batteries);
-		int correct = fl_ask(("Is this correct?\n" + new_model->to_string()).c_str());
-		if (correct == 1) //Yes
+		Robot_Model* new_model = new Robot_Model(name, model_num, price, head, torso, locomotor, &arms, batteries, pic_filename);
+		try
 		{
-			try
-			{
-				shop->add(*new_model);
-				fl_message((name + " was successfully added.").c_str());
-				robot_model_dlg->hide();
-			}
-			catch (Model_Num_Exists& e)
-			{
-				fl_beep(FL_BEEP_DEFAULT);
-				fl_alert("ERROR:\nThat model number already exists!");
-			}
+			model_correct_dlg = new Robot_Model_Correct_Dialog(new_model);
+			model_correct_dlg->show();
+		}
+		catch (exception& e)
+		{
+			fl_beep(FL_BEEP_DEFAULT);
+			fl_alert(e.what());
 		}
 	}
 }
@@ -1751,6 +1889,28 @@ void Create_Robot_ModelCB(Fl_Widget * w, void * p)
 void Cancel_Robot_ModelCB(Fl_Widget * w, void * p)
 {
 	robot_model_dlg->hide();
+}
+
+void Select_PictureCB(Fl_Widget * w, void * p)
+{
+	Fl_Native_File_Chooser pic_chooser;
+	pic_chooser.title("Select a Picture");
+	pic_chooser.type(Fl_Native_File_Chooser::BROWSE_FILE);
+	pic_chooser.filter("PNG\t*.png\n""JPEG\t*.jpg");
+	pic_chooser.directory("/Robot_Images");
+
+	switch (pic_chooser.show())
+	{
+	case -1:
+		fl_beep(FL_BEEP_ERROR);
+		fl_alert(pic_chooser.errmsg());
+		break;
+	case 1:
+		break;
+	default:
+		robot_model_dlg->pic_chosen(pic_chooser.filename());
+		break;
+	}
 }
 
 void Open_List_Models_DialogCB(Fl_Widget * w, void * p)
@@ -1809,9 +1969,21 @@ void Expand_InfoCB(Fl_Widget * w, void * p)
 		+ "\nTorso:\n" + shop_models[index].get_torso().to_string()
 		+ "\nLocomotor:\n" + shop_models[index].get_locomotor().to_string();
 
-	if(shop_models[index].get_batteries().size() + shop_models[index].get_arms().size() > 3)
+	if(shop_models[index].get_batteries().size() + shop_models[index].get_arms().size() > 2)
 	{
 		if (shop_models[index].get_batteries().size() == 3)
+		{
+			for (int i = 0; i < 2; i++)
+				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
+			fl_message(result.c_str());
+
+			result = "";
+			result += "\nBattery 3:\n" + shop_models[index].get_batteries()[2].to_string();
+			for (int i = 0; i < shop_models[index].get_arms().size(); i++)
+				result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
+			fl_message(result.c_str());
+		}
+		else if(shop_models[index].get_batteries().size() == 2)
 		{
 			for (int i = 0; i < shop_models[index].get_batteries().size(); i++)
 				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
@@ -1822,14 +1994,13 @@ void Expand_InfoCB(Fl_Widget * w, void * p)
 				result += "\nArm " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_arms()[i].to_string();
 			fl_message(result.c_str());
 		}
-		else if(shop_models[index].get_batteries().size() == 2)
+		else
 		{
-			for (int i = 0; i < shop_models[index].get_batteries().size(); i++)
-				result += "\nBattery " + Str_conversion::to_string(i + 1) + ":\n" + shop_models[index].get_batteries()[i].to_string();
+			result += "\nBattery 1:\n" + shop_models[index].get_batteries()[0].to_string();
 			result += "\nArm 1:\n" + shop_models[index].get_arms()[0].to_string();
 			fl_message(result.c_str());
 
-			result = "Arm 2:\n" + shop_models[index].get_arms()[1].to_string();
+			result = "\nArm 2:\n" + shop_models[index].get_arms()[1].to_string();
 			fl_message(result.c_str());
 		}
 	}
@@ -2080,4 +2251,25 @@ void Debug_Generate_Sales_AssociatesCB(Fl_Widget * w, void * p)
 		}
 	}
 	fl_message("DEBUG: Random sales associates created.");
+}
+
+void Is_Correct_ModelCB(Fl_Widget * w, void * p)
+{
+	model_correct_dlg->hide();
+	try
+	{
+		shop->add(model_correct_dlg->get_model());
+		fl_message((model_correct_dlg->get_model().get_name() + " was successfully added.").c_str());
+		robot_model_dlg->hide();
+	}
+	catch (Model_Num_Exists& e)
+	{
+		fl_beep(FL_BEEP_DEFAULT);
+		fl_alert("ERROR:\nThat model number already exists!");
+	}
+}
+
+void Is_Not_Correct_ModelCB(Fl_Widget * w, void * p)
+{
+	model_correct_dlg->hide();
 }
