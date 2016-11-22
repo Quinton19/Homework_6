@@ -1485,7 +1485,6 @@ private:
 	Robot_Model* model;
 	Fl_Box* image_box;
 	Fl_JPEG_Image* jpg;
-	Fl_JPEG_Image* jpg2;
 	Fl_PNG_Image* png;
 	Fl_Return_Button* yes;
 	Fl_Button* no;
@@ -1529,14 +1528,14 @@ int main()
 			{ 0 },
 		{"&Report", 0, 0, 0, FL_SUBMENU },
 			{"&All Robot Models", 0, (Fl_Callback*)Open_List_Models_DialogCB},
-			{ 0 },
+			{ 0 },/*
 		{"Debug", 0, 0, 0, FL_SUBMENU },
 			{"Generate Parts", 0, (Fl_Callback*)Debug_Generate_PartsCB },
 			{"Generate Models", 0, (Fl_Callback*)Debug_Generate_ModelsCB },
 			{"Generate One Model", 0, (Fl_Callback*)Debug_Generate_One_ModelCB, 0, FL_MENU_DIVIDER},
 			{"Generate Customers", 0, (Fl_Callback*)Debug_Generate_CustomersCB},
 			{"Generate Sales Associates", 0, (Fl_Callback*)Debug_Generate_Sales_AssociatesCB},
-			{ 0 },
+			{ 0 },*/
 		{ 0 }
 	};
 
@@ -1577,8 +1576,6 @@ int main()
 		fl_choice(("Random arm created:\n" + a.to_string()).c_str(), "OK", 0, 0);
 	}
 	*/
-    
-	//window->resizable(window);
 
 	window->end();
 	window->show();
