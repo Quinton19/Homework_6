@@ -8,7 +8,7 @@ debug: CXXFLAGS += -g
 debug: executable
 
 executable: robot_part.o head.o arm.o locomotor.o torso.o battery.o main.o helper_functions.o robot_model.o shop.o address.o apt_address.o po_box_address.o customer.o sales_associate.o robot_order.o
-		$(CXX) $(CXXOPTS) -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/include/freetype2 -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -g -O2 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -std=c++11 -o 'rrsm' 'main.o' 'Robot_Part.o' 'Head.o' 'Arm.o' 'Locomotor.o' 'Torso.o' 'Battery.o' 'helper_functions.o' 'Robot_Model.o' 'Shop.o' 'Address.o' 'Apt_Address.o' 'PO_Box_Address.o' 'Customer.o' 'Sales_Associate.o' 'Robot_Order.o' -Wl,-Bsymbolic-functions -lfltk_images -lfltk -lX11
+		$(CXX) $(CXXOPTS) -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/include/freetype2 -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -g -O2 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -std=c++11 -o 'RRS_Manager' 'main.o' 'Robot_Part.o' 'Head.o' 'Arm.o' 'Locomotor.o' 'Torso.o' 'Battery.o' 'helper_functions.o' 'Robot_Model.o' 'Shop.o' 'Address.o' 'Apt_Address.o' 'PO_Box_Address.o' 'Customer.o' 'Sales_Associate.o' 'Robot_Order.o' -Wl,-Bsymbolic-functions -lfltk_images -lfltk -lX11
 
 test: robot_part.o head.o arm.o locomotor.o torso.o battery.o helper_functions.o test.o robot_model.o shop.o address.o apt_address.o po_box_address.o customer.o sales_associate.o robot_order.o
 	g++ Robot_Part.o Head.o Arm.o Locomotor.o Torso.o Battery.o helper_functions.o test.o Robot_Model.o Shop.o Address.o Apt_Address.o PO_Box_Address.o Customer.o Sales_Associate.o Robot_Order.o
@@ -49,4 +49,4 @@ robot_order.o: Robot_Order.h Robot_Order.cpp Robot_Model.h Sales_Associate.h Cus
 	$(CXX) -c $(CXXOPTS) Robot_Order.cpp
 
 clean:
-	rm -f *.o rrsm a.out
+	rm -f *.o RRS_Manager a.out
